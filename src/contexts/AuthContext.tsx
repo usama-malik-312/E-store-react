@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/api/auth';
 import { tokenStorage } from '@/utils/token';
 import { LoginCredentials, User } from '@/types';
@@ -113,23 +113,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         },
     });
 
-    // Get current user query
-    const { data: user, isLoading: isLoadingUser } = useQuery({
-        queryKey: ['user'],
-        queryFn: authApi.getCurrentUser,
-        enabled: tokenStorage.hasToken() && !isInitializing,
-        retry: false,
-        staleTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
-    });
-
-    // Get user from localStorage as fallback
-    const storedUser = tokenStorage.getUser();
-    const currentUser = user || storedUser;
+    // Use locally stored user (we already set it on login)
+    const currentUser = tokenStorage.getUser();
 
     const hasToken = tokenStorage.hasToken();
     const isAuthenticated = hasToken && !!currentUser && !isInitializing;
-    const isLoading = isInitializing || (hasToken && isLoadingUser && !storedUser);
+    const isLoading = isInitializing;
 
     const refreshAuth = async () => {
         await refreshTokenMutation.mutateAsync();

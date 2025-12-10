@@ -7,6 +7,7 @@ export interface User {
   store_id?: number | null;
   username?: string; // For backward compatibility
   name?: string; // For backward compatibility
+  permissions?: Array<{ code: string; name: string }> | string[]; // User permissions
 }
 
 export interface LoginCredentials {

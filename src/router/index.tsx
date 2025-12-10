@@ -5,6 +5,7 @@ import { MainLayout } from '@/layouts/MainLayout';
 import { Login } from '@/pages/Login';
 import { Dashboard } from '@/pages/Dashboard';
 import { Users } from '@/pages/Users';
+import { Roles } from '@/pages/Roles';
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,16 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <MainLayout>
           <Users />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/roles',
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Roles />
         </MainLayout>
       </ProtectedRoute>
     ),

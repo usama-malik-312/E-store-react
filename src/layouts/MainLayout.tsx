@@ -11,6 +11,7 @@ import {
   SettingOutlined,
   MoonOutlined,
   SunOutlined,
+  SafetyOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -64,6 +65,11 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       key: '/users',
       icon: <UserOutlined />,
       label: 'Users',
+    },
+    {
+      key: '/roles',
+      icon: <SafetyOutlined />,
+      label: 'Roles & Permissions',
     },
     {
       key: '/settings',

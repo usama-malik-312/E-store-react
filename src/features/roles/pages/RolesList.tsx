@@ -1,0 +1,210 @@
+import { useState } from 'react';
+import { Table, Button, Space, Tag, Popconfirm, Typography, Card, Skeleton, Badge } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { motion } from 'framer-motion';
+import { useRoles, useDeleteRole } from '../hooks';
+import { useCreateRole, useUpdateRole } from '../hooks';
+import { usePermissions as usePermissionsList } from '../hooks';
+import { RoleDrawer } from '../components/RoleDrawer';
+import { Role, CreateRoleData, UpdateRoleData } from '../types';
+import { usePermissions } from '@/hooks/usePermissions';
+
+const { Title } = Typography;
+
+export const RolesList = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<Role | undefined>();
+
+  const { canCreate, canUpdate, canDelete } = usePermissions();
+  const canCreateRole = canCreate('role');
+  const canUpdateRole = canUpdate('role');
+  const canDeleteRole = canDelete('role');
+
+  const { data: roles, isLoading: rolesLoading } = useRoles();
+  const { data: permissions, isLoading: permissionsLoading } = usePermissionsList();
+
+  const createMutation = useCreateRole();
+  const updateMutation = useUpdateRole();
+  const deleteMutation = useDeleteRole();
+
+  const handleCreate = () => {
+    setEditingRole(undefined);
+    setDrawerOpen(true);
+  };
+
+  const handleEdit = (role: Role) => {
+    setEditingRole(role);
+    setDrawerOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
+
+  const handleSubmit = (formData: CreateRoleData | UpdateRoleData) => {
+    if (editingRole) {
+      updateMutation.mutate(
+        { id: editingRole.id, data: formData },
+        {
+          onSuccess: () => {
+            setDrawerOpen(false);
+            setEditingRole(undefined);
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(formData as CreateRoleData, {
+        onSuccess: () => {
+          setDrawerOpen(false);
+        },
+      });
+    }
+  };
+
+  const columns = [
+    {
+      title: 'Role Name',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a: Role, b: Role) => a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Code',
+      dataIndex: 'code',
+      key: 'code',
+      render: (code: string) => <Tag>{code}</Tag>,
+    },
+    {
+      title: 'Permissions',
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (permissions: any[]) => (
+        <div className="flex flex-wrap gap-1">
+          <Badge count={permissions?.length || 0} showZero color="blue" />
+          <span className="text-gray-500 text-sm ml-2">
+            {permissions?.length || 0} permission{permissions?.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      ),
+    },
+    {
+      title: 'Permission List',
+      dataIndex: 'permissions',
+      key: 'permissionList',
+      render: (permissions: any[]) => (
+        <div className="max-w-md">
+          <div className="flex flex-wrap gap-1">
+            {permissions?.slice(0, 5).map((perm: any) => (
+              <Tag key={perm.id} size="small">
+                {perm.name}
+              </Tag>
+            ))}
+            {permissions?.length > 5 && (
+              <Tag size="small">+{permissions.length - 5} more</Tag>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Role) => (
+        <Space>
+          {canUpdateRole && (
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+              size="small"
+            >
+              Edit
+            </Button>
+          )}
+          {canDeleteRole && (
+            <Popconfirm
+              title="Are you sure you want to delete this role?"
+              description="Users with this role will need to be reassigned."
+              onConfirm={() => handleDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="link" danger icon={<DeleteOutlined />} size="small">
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
+      ),
+    },
+  ];
+
+  if (permissionsLoading) {
+    return (
+      <div>
+        <Title level={2}>Roles & Permissions</Title>
+        <Card>
+          <Skeleton active paragraph={{ rows: 8 }} />
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <Title level={2}>Roles & Permissions</Title>
+        {canCreateRole && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate} size="large">
+            Add Role
+          </Button>
+        )}
+      </div>
+
+      <Card>
+        {rolesLoading ? (
+          <Skeleton active paragraph={{ rows: 8 }} />
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Table
+              columns={columns}
+              dataSource={roles || []}
+              rowKey="id"
+              loading={rolesLoading}
+              pagination={{
+                pageSize: 20,
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} roles`,
+              }}
+            />
+          </motion.div>
+        )}
+      </Card>
+
+      {permissions && (
+        <RoleDrawer
+          open={drawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+            setEditingRole(undefined);
+          }}
+          role={editingRole}
+          permissions={permissions}
+          onSubmit={handleSubmit}
+          isLoading={createMutation.isPending || updateMutation.isPending}
+        />
+      )}
+    </div>
+  );
+};
+
