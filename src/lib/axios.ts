@@ -119,8 +119,12 @@ axiosInstance.interceptors.response.use(
         processQueue(refreshError as AxiosError, null);
         isRefreshing = false;
         tokenStorage.remove();
-        message.error('Session expired. Please login again.');
-        window.location.href = '/login';
+        
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          message.error('Session expired. Please login again.');
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }

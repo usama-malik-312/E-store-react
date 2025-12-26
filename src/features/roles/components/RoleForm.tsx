@@ -16,7 +16,8 @@ interface RoleFormProps {
 const roleSchema = z.object({
   name: z.string().min(1, 'Role name is required'),
   code: z.string().min(1, 'Role code is required'),
-  permissionIds: z.array(z.number()).min(1, 'At least one permission is required'),
+  description: z.string().optional(),
+  permissionIds: z.array(z.number()).optional(),
 });
 
 type RoleFormData = z.infer<typeof roleSchema>;
@@ -58,6 +59,7 @@ export const RoleForm = ({
     defaultValues: {
       name: role?.name || '',
       code: role?.code || '',
+      description: role?.description || '',
       permissionIds: role?.permissions?.map((p) => p.id) || [],
     },
   });
@@ -66,7 +68,8 @@ export const RoleForm = ({
     onSubmit({
       name: data.name,
       code: data.code,
-      permissionIds: data.permissionIds,
+      description: data.description,
+      permissionIds: data.permissionIds || [],
     });
   };
 
@@ -119,7 +122,34 @@ export const RoleForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Permissions *</label>
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <Input.TextArea
+                {...field}
+                size="large"
+                placeholder="Enter role description"
+                rows={3}
+                status={errors.description ? 'error' : ''}
+              />
+            )}
+          />
+          {errors.description && (
+            <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+          )}
+        </div>
+
+        {isEdit && (
+          <div className="text-sm text-blue-600 dark:text-blue-400 mb-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+            💡 Note: To edit permissions, use the "Edit Permissions" button on the roles list.
+          </div>
+        )}
+
+        {!isEdit && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Permissions</label>
           <Controller
             name="permissionIds"
             control={control}
@@ -160,7 +190,8 @@ export const RoleForm = ({
           {errors.permissionIds && (
             <p className="text-red-500 text-xs mt-1">{errors.permissionIds.message}</p>
           )}
-        </div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>

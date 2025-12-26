@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/utils/permissions';
 import { motion } from 'framer-motion';
 import classNames from 'classnames';
 import { useTheme } from '@/hooks/useTheme';
@@ -55,28 +56,32 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       key: '/inventory',
       icon: <AppstoreOutlined />,
       label: 'Inventory',
+      show: hasPermission('inventory.read'),
     },
     {
       key: '/pos',
       icon: <ShoppingOutlined />,
       label: 'POS',
+      show: hasPermission('pos.read'),
     },
     {
       key: '/users',
       icon: <UserOutlined />,
       label: 'Users',
+      show: hasPermission('users.read'),
     },
     {
       key: '/roles',
       icon: <SafetyOutlined />,
       label: 'Roles & Permissions',
+      show: hasPermission('roles.read'),
     },
     {
       key: '/settings',
       icon: <SettingOutlined />,
       label: 'Settings',
     },
-  ];
+  ].filter((item) => item.show !== false);
 
   const userMenuItems = [
     {

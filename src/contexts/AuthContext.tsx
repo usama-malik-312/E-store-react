@@ -8,6 +8,7 @@ import { message } from 'antd';
 
 interface AuthContextType {
     user: User | null;
+    permissions: string[];
     isAuthenticated: boolean;
     isLoading: boolean;
     isLoggingIn: boolean;
@@ -39,10 +40,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const initializeAuth = async () => {
             const accessToken = tokenStorage.getAccessToken();
             const user = tokenStorage.getUser();
+            const permissions = tokenStorage.getPermissions();
 
             if (accessToken && user) {
-                // Set user in cache immediately from localStorage
+                // Set user and permissions in cache immediately from localStorage
                 queryClient.setQueryData(['user'], user);
+                queryClient.setQueryData(['permissions'], permissions);
 
                 // Verify token is still valid by fetching user (silently)
                 // Don't block initialization if it fails
@@ -50,6 +53,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                     .then((updatedUser) => {
                         tokenStorage.setUser(updatedUser);
                         queryClient.setQueryData(['user'], updatedUser);
+                        // If permissions are in user object, update them
+                        if (updatedUser.permissions) {
+                            const perms = Array.isArray(updatedUser.permissions)
+                                ? updatedUser.permissions.map((p: any) =>
+                                    typeof p === 'string' ? p : p.code
+                                )
+                                : [];
+                            tokenStorage.setPermissions(perms);
+                            queryClient.setQueryData(['permissions'], perms);
+                        }
                     })
                     .catch(() => {
                         // Token might be expired, but don't clear it yet
@@ -83,12 +96,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const loginMutation = useMutation({
         mutationFn: authApi.login,
         onSuccess: (data) => {
-            // Store tokens and user IMMEDIATELY - this is critical!
+            // Extract permissions from response or user object
+            const permissions = data.permissions ||
+                (Array.isArray(data.user?.permissions)
+                    ? data.user.permissions.map((p: any) => typeof p === 'string' ? p : p.code)
+                    : []);
+
+            // Store tokens, user, and permissions IMMEDIATELY - this is critical!
             // Backend returns "token" not "accessToken"
-            tokenStorage.setAuthData(data.token, data.refreshToken, data.user);
+            tokenStorage.setAuthData(data.token, data.refreshToken, data.user, permissions);
 
             // Set in React Query cache
             queryClient.setQueryData(['user'], data.user);
+            queryClient.setQueryData(['permissions'], permissions);
 
             message.success('Login successful!');
 
@@ -113,8 +133,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         },
     });
 
-    // Use locally stored user (we already set it on login)
+    // Use locally stored user and permissions (we already set them on login)
     const currentUser = tokenStorage.getUser();
+    const currentPermissions = tokenStorage.getPermissions();
 
     const hasToken = tokenStorage.hasToken();
     const isAuthenticated = hasToken && !!currentUser && !isInitializing;
@@ -126,6 +147,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const value: AuthContextType = {
         user: currentUser || null,
+        permissions: currentPermissions,
         isAuthenticated,
         isLoading,
         isLoggingIn: loginMutation.isPending,
