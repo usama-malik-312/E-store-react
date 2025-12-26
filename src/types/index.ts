@@ -19,6 +19,7 @@ export interface LoginResponse {
   token: string; // Backend returns "token" not "accessToken"
   refreshToken: string;
   user: User;
+  permissions?: string[]; // Array of permission codes
 }
 
 export interface RefreshTokenResponse {

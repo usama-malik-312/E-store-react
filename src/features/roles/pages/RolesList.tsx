@@ -12,6 +12,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 const { Title } = Typography;
 
 export const RolesList = () => {
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | undefined>();
 
@@ -69,48 +70,23 @@ export const RolesList = () => {
       sorter: (a: Role, b: Role) => a.name.localeCompare(b.name),
     },
     {
-      title: 'Code',
-      dataIndex: 'code',
-      key: 'code',
-      render: (code: string) => <Tag>{code}</Tag>,
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (desc: string) => desc || <span className="text-gray-400">No description</span>,
     },
     {
-      title: 'Permissions',
+      title: 'Total Permissions Assigned',
       dataIndex: 'permissions',
       key: 'permissions',
       render: (permissions: any[]) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex items-center gap-2">
           <Badge count={permissions?.length || 0} showZero color="blue" />
-          <span className="text-gray-500 text-sm ml-2">
+          <span className="text-gray-600 font-medium">
             {permissions?.length || 0} permission{permissions?.length !== 1 ? 's' : ''}
           </span>
         </div>
       ),
-    },
-    {
-      title: 'Permission List',
-      dataIndex: 'permissions',
-      key: 'permissionList',
-      render: (permissions: any[]) => (
-        <div className="max-w-md">
-          <div className="flex flex-wrap gap-1">
-            {permissions?.slice(0, 5).map((perm: any) => (
-              <Tag key={perm.id} size="small">
-                {perm.name}
-              </Tag>
-            ))}
-            {permissions?.length > 5 && (
-              <Tag size="small">+{permissions.length - 5} more</Tag>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
       title: 'Actions',
@@ -118,14 +94,24 @@ export const RolesList = () => {
       render: (_: any, record: Role) => (
         <Space>
           {canUpdateRole && (
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-              size="small"
-            >
-              Edit
-            </Button>
+            <>
+              <Button
+                type="link"
+                icon={<SafetyOutlined />}
+                onClick={() => navigate(`/roles/${record.id}/permissions`)}
+                size="small"
+              >
+                Edit Permissions
+              </Button>
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEdit(record)}
+                size="small"
+              >
+                Edit
+              </Button>
+            </>
           )}
           {canDeleteRole && (
             <Popconfirm

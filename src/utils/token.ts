@@ -3,6 +3,7 @@ import { User } from '@/types';
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_KEY = 'user';
+const PERMISSIONS_KEY = 'permissions';
 
 export const tokenStorage = {
   /**
@@ -54,13 +55,36 @@ export const tokenStorage = {
   },
 
   /**
-   * Store all auth data (tokens + user)
+   * Get permissions from localStorage
+   */
+  getPermissions(): string[] {
+    try {
+      const permsStr = localStorage.getItem(PERMISSIONS_KEY);
+      if (!permsStr) return [];
+      return JSON.parse(permsStr) as string[];
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Set permissions in localStorage
+   */
+  setPermissions(permissions: string[]): void {
+    localStorage.setItem(PERMISSIONS_KEY, JSON.stringify(permissions));
+  },
+
+  /**
+   * Store all auth data (tokens + user + permissions)
    * This is the main method to use after login
    */
-  setAuthData(token: string, refreshToken: string, user: User): void {
+  setAuthData(token: string, refreshToken: string, user: User, permissions?: string[]): void {
     this.setAccessToken(token);
     this.setRefreshToken(refreshToken);
     this.setUser(user);
+    if (permissions) {
+      this.setPermissions(permissions);
+    }
   },
 
   /**
@@ -87,6 +111,7 @@ export const tokenStorage = {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(PERMISSIONS_KEY);
   },
 
   /**

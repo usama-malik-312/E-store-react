@@ -1,4 +1,4 @@
-import { useAuth } from './useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { usePermissions as usePermissionsList } from '@/features/roles/hooks';
 
 /**
@@ -6,12 +6,10 @@ import { usePermissions as usePermissionsList } from '@/features/roles/hooks';
  * Returns helper functions to check if user has specific permissions
  */
 export const usePermissions = () => {
-  const { user } = useAuth();
+  const { user, permissions: userPermissions } = useAuthContext();
   const { data: permissionsList } = usePermissionsList();
 
-  // Get user's role permissions from JWT or user object
-  // Assuming backend includes permissions in user object or we fetch them
-  const userPermissions = user?.permissions || [];
+  // Get user's role
   const userRole = user?.role || '';
 
   /**

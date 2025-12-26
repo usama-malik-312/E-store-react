@@ -10,6 +10,7 @@ export interface Role {
   id: number;
   name: string;
   code: string;
+  description?: string;
   permissions: Permission[];
   createdAt: string;
   updatedAt: string;
@@ -18,12 +19,14 @@ export interface Role {
 export interface CreateRoleData {
   name: string;
   code: string;
+  description?: string;
   permissionIds: number[];
 }
 
 export interface UpdateRoleData {
   name?: string;
   code?: string;
+  description?: string;
   permissionIds?: number[];
 }
 
