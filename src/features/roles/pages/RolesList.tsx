@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Table, Button, Space, Tag, Popconfirm, Typography, Card, Skeleton, Badge } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SafetyOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useRoles, useDeleteRole } from '../hooks';
 import { useCreateRole, useUpdateRole } from '../hooks';
@@ -23,6 +24,9 @@ export const RolesList = () => {
 
   const { data: roles, isLoading: rolesLoading } = useRoles();
   const { data: permissions, isLoading: permissionsLoading } = usePermissionsList();
+
+  // Ensure roles is always an array
+  const rolesArray = Array.isArray(roles) ? roles : [];
 
   const createMutation = useCreateRole();
   const updateMutation = useUpdateRole();
@@ -164,7 +168,7 @@ export const RolesList = () => {
           >
             <Table
               columns={columns}
-              dataSource={roles || []}
+              dataSource={rolesArray}
               rowKey="id"
               loading={rolesLoading}
               pagination={{

@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -20,6 +20,9 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const Login = () => {
   const { login, isLoggingIn, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const prevIsLoggingInRef = useRef(isLoggingIn);
+  const hasRedirectedRef = useRef(false);
 
   const {
     control,
@@ -34,11 +37,25 @@ export const Login = () => {
   });
 
   useEffect(() => {
-    // Redirect to /users after successful login
-    if (isAuthenticated && !isLoggingIn) {
+    // Reset redirect flag when leaving login page
+    if (location.pathname !== "/login") {
+      hasRedirectedRef.current = false;
+      return;
+    }
+
+    // Only redirect if we're on the login page and login just completed
+    // Check if login just finished (was loading, now not loading, and authenticated)
+    if (
+      prevIsLoggingInRef.current &&
+      !isLoggingIn &&
+      isAuthenticated &&
+      !hasRedirectedRef.current
+    ) {
+      hasRedirectedRef.current = true;
       navigate("/users", { replace: true });
     }
-  }, [isAuthenticated, isLoggingIn, navigate]);
+    prevIsLoggingInRef.current = isLoggingIn;
+  }, [isAuthenticated, isLoggingIn, navigate, location.pathname]);
 
   const onSubmit = async (data: LoginFormData) => {
     login(data);

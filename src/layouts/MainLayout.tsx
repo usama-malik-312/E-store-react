@@ -15,7 +15,6 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { hasPermission } from "@/utils/permissions";
 import { motion } from "framer-motion";
 import classNames from "classnames";
 import { useTheme } from "@/hooks/useTheme";
@@ -81,7 +80,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       icon: <SettingOutlined />,
       label: "Settings",
     },
-  ].filter((item) => item.show !== false);
+  ];
 
   const userMenuItems = [
     {
@@ -109,6 +108,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
   const handleSidebarMenuClick = ({ key }: { key: string }) => {
     navigate(key);
+    // console.log("key=====", key);
     if (isMobile) {
       setCollapsed(true);
     }

@@ -1,18 +1,20 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { PublicRoute } from '@/components/PublicRoute';
-import { PermissionRoute } from '@/components/PermissionRoute';
-import { MainLayout } from '@/layouts/MainLayout';
-import { Login } from '@/pages/Login';
-import { Dashboard } from '@/pages/Dashboard';
-import { Users } from '@/pages/Users';
-import { Roles } from '@/pages/Roles';
-import { RolePermissions } from '@/features/roles/pages/RolePermissions';
-import { Unauthorized } from '@/pages/Unauthorized';
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PublicRoute } from "@/components/PublicRoute";
+import { MainLayout } from "@/layouts/MainLayout";
+import { Login } from "@/pages/Login";
+import { Dashboard } from "@/pages/Dashboard";
+import { Users } from "@/pages/Users";
+import { Roles } from "@/pages/Roles";
+import { Inventory } from "@/pages/Inventory";
+import { RolePermissions } from "@/features/roles/pages/RolePermissions";
+import { POS } from "@/pages/POS";
+import { Settings } from "@/pages/Settings";
+import { Unauthorized } from "@/pages/Unauthorized";
 
 export const router = createBrowserRouter([
   {
-    path: '/login',
+    path: "/login",
     element: (
       <PublicRoute>
         <Login />
@@ -20,7 +22,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/',
+    path: "/",
     element: (
       <ProtectedRoute>
         <MainLayout>
@@ -30,7 +32,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/dashboard',
+    path: "/dashboard",
     element: (
       <ProtectedRoute>
         <MainLayout>
@@ -40,7 +42,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/users',
+    path: "/users",
     element: (
       <ProtectedRoute>
         <MainLayout>
@@ -50,27 +52,57 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/roles',
+    path: "/inventory",
     element: (
-      <PermissionRoute permission="roles.read">
+      <ProtectedRoute>
+        <MainLayout>
+          <Inventory />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pos",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <POS />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Settings />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/roles",
+    element: (
+      <ProtectedRoute>
         <MainLayout>
           <Roles />
         </MainLayout>
-      </PermissionRoute>
+      </ProtectedRoute>
     ),
   },
   {
-    path: '/roles/:id/permissions',
+    path: "/roles/:id/permissions",
     element: (
-      <PermissionRoute permission="roles.update">
+      <ProtectedRoute>
         <MainLayout>
           <RolePermissions />
         </MainLayout>
-      </PermissionRoute>
+      </ProtectedRoute>
     ),
   },
   {
-    path: '/unauthorized',
+    path: "/unauthorized",
     element: (
       <MainLayout>
         <Unauthorized />
@@ -78,8 +110,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '*',
+    path: "*",
     element: <Navigate to="/users" replace />,
   },
 ]);
-
