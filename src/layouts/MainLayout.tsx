@@ -1,5 +1,5 @@
-import { ReactNode, useState, useEffect } from 'react';
-import { Layout, Menu, Button, Avatar, Dropdown, Space } from 'antd';
+import { ReactNode, useState, useEffect } from "react";
+import { Layout, Menu, Button, Avatar, Dropdown, Space } from "antd";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -12,13 +12,13 @@ import {
   MoonOutlined,
   SunOutlined,
   SafetyOutlined,
-} from '@ant-design/icons';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { hasPermission } from '@/utils/permissions';
-import { motion } from 'framer-motion';
-import classNames from 'classnames';
-import { useTheme } from '@/hooks/useTheme';
+} from "@ant-design/icons";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { hasPermission } from "@/utils/permissions";
+import { motion } from "framer-motion";
+import classNames from "classnames";
+import { useTheme } from "@/hooks/useTheme";
 
 const { Header, Sider, Content } = Layout;
 
@@ -42,66 +42,66 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       }
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const menuItems = [
     {
-      key: '/dashboard',
+      key: "/dashboard",
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: "Dashboard",
     },
     {
-      key: '/inventory',
+      key: "/inventory",
       icon: <AppstoreOutlined />,
-      label: 'Inventory',
-      show: hasPermission('inventory.read'),
+      label: "Inventory",
+      // show: hasPermission("inventory.read"),
     },
     {
-      key: '/pos',
+      key: "/pos",
       icon: <ShoppingOutlined />,
-      label: 'POS',
-      show: hasPermission('pos.read'),
+      label: "POS",
+      // show: hasPermission("pos.read"),
     },
     {
-      key: '/users',
+      key: "/users",
       icon: <UserOutlined />,
-      label: 'Users',
-      show: hasPermission('users.read'),
+      label: "Users",
+      // show: hasPermission("users.read"),
     },
     {
-      key: '/roles',
+      key: "/roles",
       icon: <SafetyOutlined />,
-      label: 'Roles & Permissions',
-      show: hasPermission('roles.read'),
+      label: "Roles & Permissions",
+      // show: hasPermission("roles.read"),
     },
     {
-      key: '/settings',
+      key: "/settings",
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: "Settings",
     },
   ].filter((item) => item.show !== false);
 
   const userMenuItems = [
     {
-      key: 'profile',
+      key: "profile",
       icon: <UserOutlined />,
-      label: 'Profile',
+      label: "Profile",
     },
     {
-      key: 'logout',
+      key: "logout",
       icon: <LogoutOutlined />,
-      label: 'Logout',
+      label: "Logout",
       danger: true,
     },
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    if (key === 'logout') {
+    if (key === "logout") {
       logout();
-    } else if (key === 'profile') {
-      navigate('/profile');
+    } else if (key === "profile") {
+      navigate("/profile");
     } else {
       navigate(key);
     }
@@ -127,15 +127,15 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           onClick={() => setCollapsed(true)}
         />
       )}
-      
+
       <Sider
         trigger={null}
         collapsible
         collapsed={collapsed}
-        className={classNames('fixed left-0 top-0 bottom-0 h-screen z-50', {
-          'shadow-lg': isMobile && !collapsed,
+        className={classNames("fixed left-0 top-0 bottom-0 h-screen z-50", {
+          "shadow-lg": isMobile && !collapsed,
         })}
-        theme={theme === 'dark' ? 'dark' : 'light'}
+        theme={theme === "dark" ? "dark" : "light"}
         breakpoint="lg"
         collapsedWidth={isMobile ? 0 : 80}
       >
@@ -145,19 +145,29 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           transition={{ duration: 0.2 }}
         >
           <div className="h-16 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
-            <h1 className={classNames('text-xl font-bold text-primary-600 dark:text-primary-400', {
-              'hidden': collapsed,
-            })}>
+            <h1
+              className={classNames(
+                "text-xl font-bold text-primary-600 dark:text-primary-400",
+                {
+                  hidden: collapsed,
+                }
+              )}
+            >
               Electric Store
             </h1>
-            <h1 className={classNames('text-xl font-bold text-primary-600 dark:text-primary-400', {
-              'hidden': collapsed || isMobile,
-            })}>
+            <h1
+              className={classNames(
+                "text-xl font-bold text-primary-600 dark:text-primary-400",
+                {
+                  hidden: collapsed || isMobile,
+                }
+              )}
+            >
               ES
             </h1>
           </div>
           <Menu
-            theme={theme === 'dark' ? 'dark' : 'light'}
+            theme={theme === "dark" ? "dark" : "light"}
             mode="inline"
             selectedKeys={[location.pathname]}
             items={menuItems}
@@ -165,12 +175,14 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           />
         </motion.div>
       </Sider>
-      
-      <Layout className={classNames('transition-all duration-200', {
-        'ml-0': isMobile || collapsed,
-        'ml-[200px]': !isMobile && !collapsed,
-        'ml-[80px]': !isMobile && collapsed,
-      })}>
+
+      <Layout
+        className={classNames("transition-all duration-200", {
+          "ml-0": isMobile || collapsed,
+          "ml-[200px]": !isMobile && !collapsed,
+          "ml-[80px]": !isMobile && collapsed,
+        })}
+      >
         <Header className="bg-white dark:bg-gray-800 px-4 flex items-center justify-between shadow-sm sticky top-0 z-30">
           <Button
             type="text"
@@ -181,7 +193,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           <Space>
             <Button
               type="text"
-              icon={theme === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+              icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
               onClick={toggleTheme}
             />
             <Dropdown
@@ -193,7 +205,9 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             >
               <Space className="cursor-pointer">
                 <Avatar icon={<UserOutlined />} />
-                <span className="hidden md:inline">{user?.username || user?.email}</span>
+                <span className="hidden md:inline">
+                  {user?.username || user?.email}
+                </span>
               </Space>
             </Dropdown>
           </Space>
@@ -211,4 +225,3 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     </Layout>
   );
 };
-

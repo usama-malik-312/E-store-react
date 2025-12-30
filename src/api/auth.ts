@@ -5,7 +5,7 @@ import { LoginCredentials, LoginResponse, RefreshTokenResponse, User } from '@/t
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     const response = await axiosInstance.post<LoginResponse>('/auth/login', credentials);
-    return response.data;
+    return response.data.data;
   },
 
   logout: async (): Promise<void> => {

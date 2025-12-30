@@ -1,18 +1,18 @@
-import { Input, Button, Card, Typography } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useAuth } from '@/hooks/useAuth';
-import { motion } from 'framer-motion';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Input, Button, Card, Typography } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuth } from "@/hooks/useAuth";
+import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
 const loginSchema = z.object({
-  identifier: z.string().min(1, 'Email or username is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  identifier: z.string().min(1, "Email or username is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -28,15 +28,15 @@ export const Login = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      identifier: '',
-      password: '',
+      identifier: "",
+      password: "",
     },
   });
 
   useEffect(() => {
+    // Redirect to /users after successful login
     if (isAuthenticated && !isLoggingIn) {
-      // Redirect to /users after successful login
-      navigate('/users', { replace: true });
+      navigate("/users", { replace: true });
     }
   }, [isAuthenticated, isLoggingIn, navigate]);
 
@@ -58,12 +58,16 @@ export const Login = () => {
             <Title level={2} className="mb-2">
               Electric Store
             </Title>
-            <Typography.Text type="secondary">Management System</Typography.Text>
+            <Typography.Text type="secondary">
+              Management System
+            </Typography.Text>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Email or Username</label>
+              <label className="block text-sm font-medium mb-2">
+                Email or Username
+              </label>
               <Controller
                 name="identifier"
                 control={control}
@@ -73,7 +77,7 @@ export const Login = () => {
                     size="large"
                     prefix={<UserOutlined />}
                     placeholder="Enter your email or username"
-                    status={errors.identifier ? 'error' : ''}
+                    status={errors.identifier ? "error" : ""}
                   />
                 )}
               />
@@ -95,7 +99,7 @@ export const Login = () => {
                     size="large"
                     prefix={<LockOutlined />}
                     placeholder="Enter your password"
-                    status={errors.password ? 'error' : ''}
+                    status={errors.password ? "error" : ""}
                   />
                 )}
               />
@@ -122,4 +126,3 @@ export const Login = () => {
     </div>
   );
 };
-
