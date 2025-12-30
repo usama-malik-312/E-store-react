@@ -35,7 +35,6 @@ export interface UsersFilters extends PaginationParams {
   role?: string;
   status?: string;
   search?: string;
+  sort?: string;
 }
-
-export type UsersResponse = PaginatedResponse<User>;
 

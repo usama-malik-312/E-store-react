@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { User, CreateUserData, UpdateUserData } from '../types';
+import { useRoles } from '@/features/roles/hooks';
 
 const { Option } = Select;
 
@@ -14,23 +15,42 @@ interface UserFormProps {
   isEdit?: boolean;
 }
 
-const userSchema = z.object({
+const createUserSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
   full_name: z.string().min(1, 'Full name is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.string().min(1, 'Role is required'),
   phone: z.string().optional(),
 });
 
-type UserFormData = z.infer<typeof userSchema>;
+const updateUserSchema = z.object({
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  full_name: z.string().min(1, 'Full name is required'),
+  password: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length === 0 || val.length >= 6, {
+      message: 'Password must be at least 6 characters',
+    }),
+  role: z.string().min(1, 'Role is required'),
+  phone: z.string().optional(),
+});
+
+type CreateUserFormData = z.infer<typeof createUserSchema>;
+type UpdateUserFormData = z.infer<typeof updateUserSchema>;
+type UserFormData = CreateUserFormData | UpdateUserFormData;
 
 export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFormProps) => {
+  // Fetch roles for dropdown
+  const { data: rolesData, isLoading: rolesLoading } = useRoles({}, 1, 100);
+  const roles = rolesData?.data || [];
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<UserFormData>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema),
     defaultValues: {
       email: user?.email || '',
       full_name: user?.full_name || '',
@@ -45,12 +65,14 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
       email: data.email,
       full_name: data.full_name,
       role: data.role,
-      phone: data.phone,
+      phone: data.phone || undefined,
     };
 
     // Only include password if it's provided (for edit) or required (for create)
-    if (!isEdit || data.password) {
-      (submitData as any).password = data.password;
+    if (!isEdit) {
+      (submitData as CreateUserData).password = data.password as string;
+    } else if (data.password && data.password.trim() !== '') {
+      (submitData as UpdateUserData).password = data.password as string;
     }
 
     onSubmit(submitData);
@@ -131,11 +153,18 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
                 placeholder="Select role"
                 className="w-full"
                 status={errors.role ? 'error' : ''}
+                loading={rolesLoading}
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                }
               >
-                <Option value="owner">Owner</Option>
-                <Option value="admin">Admin</Option>
-                <Option value="manager">Manager</Option>
-                <Option value="staff">Staff</Option>
+                {roles.map((role) => (
+                  <Option key={role.id} value={role.code || role.name}>
+                    {role.name}
+                  </Option>
+                ))}
               </Select>
             )}
           />

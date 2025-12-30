@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Checkbox, Typography, Space, Divider, Spin, message } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import { useRole, usePermissions, useUpdateRole } from '../hooks';
+import { useRole, usePermissions, useUpdateRolePermissions } from '../hooks';
 import { Permission } from '../types';
 
 const { Title } = Typography;
@@ -41,7 +41,7 @@ export const RolePermissions = () => {
 
   const { data: role, isLoading: roleLoading } = useRole(roleId);
   const { data: allPermissions, isLoading: permissionsLoading } = usePermissions();
-  const updateMutation = useUpdateRole();
+  const updatePermissionsMutation = useUpdateRolePermissions();
 
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
 
@@ -80,16 +80,13 @@ export const RolePermissions = () => {
   const handleSave = () => {
     if (!roleId) return;
 
-    updateMutation.mutate(
+    updatePermissionsMutation.mutate(
       {
         id: roleId,
-        data: {
-          permissionIds: selectedPermissionIds,
-        },
+        permissionIds: selectedPermissionIds,
       },
       {
         onSuccess: () => {
-          message.success('Permissions updated successfully');
           navigate('/roles');
         },
       }
@@ -129,7 +126,7 @@ export const RolePermissions = () => {
           type="primary"
           icon={<SaveOutlined />}
           onClick={handleSave}
-          loading={updateMutation.isPending}
+          loading={updatePermissionsMutation.isPending}
           size="large"
         >
           Save Permissions

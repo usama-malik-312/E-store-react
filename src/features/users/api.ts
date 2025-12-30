@@ -1,5 +1,6 @@
 import { axiosInstance } from '@/lib/axios';
-import { UsersFilters, UsersResponse, User, CreateUserData, UpdateUserData } from './types';
+import { UsersFilters, User, CreateUserData, UpdateUserData } from './types';
+import { ApiResponse, unwrapResponse, unwrapPaginatedResponse } from '@/utils/apiResponse';
 
 export const usersApi = {
   /**
@@ -9,39 +10,49 @@ export const usersApi = {
     filters: UsersFilters = {},
     page: number = 1,
     limit: number = 20
-  ): Promise<UsersResponse> => {
-    const response = await axiosInstance.get<UsersResponse>('/users', {
+  ): Promise<{
+    data: User[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }> => {
+    const response = await axiosInstance.get<ApiResponse<User[]>>('/users', {
       params: {
         ...filters,
         page,
         limit,
+        search: filters.search,
+        sort: filters.sort || 'created_at:DESC',
       },
     });
-    return response.data;
+    return unwrapPaginatedResponse(response.data);
   },
 
   /**
    * Get user by ID
    */
   getUserById: async (id: number): Promise<User> => {
-    const response = await axiosInstance.get<User>(`/users/${id}`);
-    return response.data;
+    const response = await axiosInstance.get<ApiResponse<User>>(`/users/${id}`);
+    return unwrapResponse(response.data);
   },
 
   /**
    * Create user
    */
   createUser: async (data: CreateUserData): Promise<User> => {
-    const response = await axiosInstance.post<User>('/users', data);
-    return response.data;
+    const response = await axiosInstance.post<ApiResponse<User>>('/users', data);
+    return unwrapResponse(response.data);
   },
 
   /**
    * Update user
    */
   updateUser: async (id: number, data: UpdateUserData): Promise<User> => {
-    const response = await axiosInstance.put<User>(`/users/${id}`, data);
-    return response.data;
+    const response = await axiosInstance.put<ApiResponse<User>>(`/users/${id}`, data);
+    return unwrapResponse(response.data);
   },
 
   /**

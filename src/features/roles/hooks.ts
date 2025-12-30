@@ -1,15 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { rolesApi } from './api';
 import { CreateRoleData, UpdateRoleData } from './types';
+import { PaginationParams } from '@/types';
 import { message } from 'antd';
 
 /**
- * Hook to fetch all roles
+ * Hook to fetch all roles with pagination
  */
-export const useRoles = () => {
+export const useRoles = (params: PaginationParams = {}, page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: ['roles'],
-    queryFn: () => rolesApi.getRoles(),
+    queryKey: ['roles', params, page, limit],
+    queryFn: () => rolesApi.getRoles({ ...params, page, limit }),
+    keepPreviousData: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -89,6 +91,26 @@ export const useDeleteRole = () => {
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || 'Failed to delete role';
+      message.error(errorMessage);
+    },
+  });
+};
+
+/**
+ * Hook to update role permissions
+ */
+export const useUpdateRolePermissions = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, permissionIds }: { id: number; permissionIds: number[] }) =>
+      rolesApi.updateRolePermissions(id, permissionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+      message.success('Permissions updated successfully');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 'Failed to update permissions';
       message.error(errorMessage);
     },
   });

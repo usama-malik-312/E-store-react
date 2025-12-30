@@ -25,7 +25,7 @@ export const UsersList = () => {
   const canUpdateUser = canUpdate('user');
   const canDeleteUser = canDelete('user');
 
-  const { data, isLoading } = useUsers(
+  const { data: usersData, isLoading } = useUsers(
     {
       search,
       role: roleFilter || undefined,
@@ -34,6 +34,10 @@ export const UsersList = () => {
     page,
     limit
   );
+
+  // Extract users array and pagination from response
+  const users = usersData?.data || [];
+  const usersArray = Array.isArray(users) ? users : [];
 
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
@@ -219,16 +223,20 @@ export const UsersList = () => {
           >
             <Table
               columns={columns}
-              dataSource={data?.data || []}
+              dataSource={usersArray}
               rowKey="id"
               loading={isLoading}
               pagination={{
                 current: page,
                 pageSize: limit,
-                total: data?.total || 0,
-                showSizeChanger: false,
+                total: usersData?.pagination?.total || 0,
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
                 showTotal: (total) => `Total ${total} users`,
                 onChange: (page) => setPage(page),
+                onShowSizeChange: (_, size) => {
+                  // You can add limit state if needed
+                },
               }}
             />
           </motion.div>

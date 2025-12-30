@@ -22,10 +22,11 @@ export const RolesList = () => {
   const canUpdateRole = canUpdate('role');
   const canDeleteRole = canDelete('role');
 
-  const { data: roles, isLoading: rolesLoading } = useRoles();
+  const { data: rolesData, isLoading: rolesLoading } = useRoles();
   const { data: permissions, isLoading: permissionsLoading } = usePermissionsList();
 
-  // Ensure roles is always an array
+  // Extract roles array from paginated response
+  const roles = rolesData?.data || [];
   const rolesArray = Array.isArray(roles) ? roles : [];
 
   const createMutation = useCreateRole();
