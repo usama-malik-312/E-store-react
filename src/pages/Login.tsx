@@ -1,5 +1,4 @@
-import { Input, Button, Card, Typography } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,8 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const { Title } = Typography;
+import { Card } from "@/components/ui/Card";
+import { InputField } from "@/components/ui/InputField";
+import { Button } from "@/components/ui/Button";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required"),
@@ -23,6 +23,7 @@ export const Login = () => {
   const location = useLocation();
   const prevIsLoggingInRef = useRef(isLoggingIn);
   const hasRedirectedRef = useRef(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     control,
@@ -63,79 +64,150 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full max-w-md"
+        className="w-full max-w-[450px]"
       >
-        <Card className="shadow-xl">
-          <div className="text-center mb-8">
-            <Title level={2} className="mb-2">
+        <Card
+          className="shadow-[0px_4px_15px_rgba(0,0,0,0.1)] rounded-2xl border-0"
+          padding="lg"
+        >
+          {/* Store Logo Placeholder */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-md mb-4">
+              <svg
+                className="w-12 h-12 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
               Electric Store
-            </Title>
-            <Typography.Text type="secondary">
-              Management System
-            </Typography.Text>
+            </h1>
+            <p className="text-sm text-gray-500 font-medium">
+              POS & Inventory Management
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Email or Username
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Email/Username Input */}
+            <Controller
+              name="identifier"
+              control={control}
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  label="Email / Username"
+                  type="text"
+                  placeholder="Enter your email or username"
+                  error={errors.identifier?.message}
+                  required
+                />
+              )}
+            />
+
+            {/* Password Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Password
+                <span className="text-red-500 ml-1">*</span>
               </label>
-              <Controller
-                name="identifier"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    size="large"
-                    prefix={<UserOutlined />}
-                    placeholder="Enter your email or username"
-                    status={errors.identifier ? "error" : ""}
-                  />
-                )}
-              />
-              {errors.identifier && (
-                <Typography.Text type="danger" className="text-xs mt-1 block">
-                  {errors.identifier.message}
-                </Typography.Text>
-              )}
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <Input.Password
-                    {...field}
-                    size="large"
-                    prefix={<LockOutlined />}
-                    placeholder="Enter your password"
-                    status={errors.password ? "error" : ""}
-                  />
-                )}
-              />
+              <div className="relative">
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 dark:border-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 shadow-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0A10.05 10.05 0 015.12 5.12m3.46 3.46L12 12m-3.42-3.42L3 3m6.42 6.42L12 12m0 0l3.29-3.29M12 12l3.29 3.29M12 12l-3.29-3.29m6.58 6.58L21 21"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.password && (
-                <Typography.Text type="danger" className="text-xs mt-1 block">
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
                   {errors.password.message}
-                </Typography.Text>
+                </p>
               )}
             </div>
 
+            {/* Forgot Password Link */}
+            <div className="flex justify-end -mt-2">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Handle forgot password logic here
+                }}
+                className="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Login Button */}
             <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              block
-              loading={isLoggingIn}
-              className="mb-4"
+              type="submit"
+              variant="primary"
+              className="w-full py-3 rounded-xl text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
+              isLoading={isLoggingIn}
             >
-              Sign In
+              Login
             </Button>
           </form>
         </Card>
