@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Checkbox, Typography, Space, Divider, Spin, message } from 'antd';
-import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
-import { useRole, usePermissions, useUpdateRolePermissions } from '../hooks';
-import { Permission } from '../types';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Card, Button, Checkbox, Typography, Divider, Spin } from "antd";
+import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useRole, usePermissions, useUpdateRolePermissions } from "../hooks";
+import { Permission } from "../types";
 
 const { Title } = Typography;
 
@@ -13,7 +13,7 @@ const groupPermissionsByModule = (permissions: Permission[]) => {
   const grouped: Record<string, Permission[]> = {};
 
   permissions.forEach((perm) => {
-    const module = perm.module || 'Other';
+    const module = perm.module || "Other";
     if (!grouped[module]) {
       grouped[module] = [];
     }
@@ -28,10 +28,10 @@ const groupPermissionsByModule = (permissions: Permission[]) => {
 
 // CRUD actions for each module
 const CRUD_ACTIONS = [
-  { code: 'create', label: 'Create' },
-  { code: 'read', label: 'Read' },
-  { code: 'update', label: 'Update' },
-  { code: 'delete', label: 'Delete' },
+  { code: "create", label: "Create" },
+  { code: "read", label: "Read" },
+  { code: "update", label: "Update" },
+  { code: "delete", label: "Delete" },
 ];
 
 export const RolePermissions = () => {
@@ -40,10 +40,13 @@ export const RolePermissions = () => {
   const roleId = id ? parseInt(id) : null;
 
   const { data: role, isLoading: roleLoading } = useRole(roleId);
-  const { data: allPermissions, isLoading: permissionsLoading } = usePermissions();
+  const { data: allPermissions, isLoading: permissionsLoading } =
+    usePermissions();
   const updatePermissionsMutation = useUpdateRolePermissions();
 
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>(
+    []
+  );
 
   useEffect(() => {
     if (role?.permissions) {
@@ -64,7 +67,9 @@ export const RolePermissions = () => {
   };
 
   const handleSelectAllModule = (modulePermissions: Permission[]) => {
-    const allSelected = modulePermissions.every((p) => selectedPermissionIds.includes(p.id));
+    const allSelected = modulePermissions.every((p) =>
+      selectedPermissionIds.includes(p.id)
+    );
     if (allSelected) {
       // Deselect all in module
       setSelectedPermissionIds((prev) =>
@@ -87,7 +92,7 @@ export const RolePermissions = () => {
       },
       {
         onSuccess: () => {
-          navigate('/roles');
+          navigate("/roles");
         },
       }
     );
@@ -115,7 +120,10 @@ export const RolePermissions = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/roles')}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/roles")}
+          >
             Back
           </Button>
           <Title level={2} className="mb-0">
@@ -149,7 +157,7 @@ export const RolePermissions = () => {
             );
 
             return (
-              <div key={group.module} className={groupIndex > 0 ? 'mt-6' : ''}>
+              <div key={group.module} className={groupIndex > 0 ? "mt-6" : ""}>
                 <div className="flex items-center justify-between mb-4">
                   <Title level={4} className="mb-0">
                     {group.module}
@@ -166,12 +174,16 @@ export const RolePermissions = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {CRUD_ACTIONS.map((action) => {
                     const permission = modulePermissions.find(
-                      (p) => p.code === `${group.module.toLowerCase()}.${action.code}`
+                      (p) =>
+                        p.code ===
+                        `${group.module.toLowerCase()}.${action.code}`
                     );
 
                     if (!permission) return null;
 
-                    const isChecked = selectedPermissionIds.includes(permission.id);
+                    const isChecked = selectedPermissionIds.includes(
+                      permission.id
+                    );
 
                     return (
                       <div
@@ -205,4 +217,3 @@ export const RolePermissions = () => {
     </div>
   );
 };
-

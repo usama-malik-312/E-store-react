@@ -10,7 +10,7 @@ export const useUsers = (filters: UsersFilters = {}, page: number = 1, limit: nu
   return useQuery({
     queryKey: ['users', filters, page, limit],
     queryFn: () => usersApi.getUsers(filters, page, limit),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };

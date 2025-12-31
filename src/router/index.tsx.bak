@@ -1,0 +1,138 @@
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PublicRoute } from "@/components/PublicRoute";
+import { MainLayout } from "@/layouts/MainLayout";
+import { Login } from "@/pages/Login";
+import { Dashboard } from "@/pages/Dashboard";
+import { Users } from "@/pages/Users";
+import { Roles } from "@/pages/Roles";
+import { Inventory } from "@/pages/Inventory";
+import { RolePermissions } from "@/features/roles/pages/RolePermissions";
+import { CreateUser } from "@/features/users/pages/CreateUser";
+import { EditUser } from "@/features/users/pages/EditUser";
+import { POS } from "@/pages/POS";
+import { Settings } from "@/pages/Settings";
+import { Unauthorized } from "@/pages/Unauthorized";
+
+export const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Dashboard />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Dashboard />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/users",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Users />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/users/create",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <CreateUser />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/users/:id/edit",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <EditUser />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/inventory",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Inventory />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pos",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <POS />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Settings />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/roles",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <Roles />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/roles/:id/permissions",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <RolePermissions />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/unauthorized",
+    element: (
+      <MainLayout>
+        <Unauthorized />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "*",
+    element: <Navigate to="/users" replace />,
+  },
+]);

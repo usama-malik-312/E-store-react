@@ -12,6 +12,11 @@ import {
   MoonOutlined,
   SunOutlined,
   SafetyOutlined,
+  ShopOutlined,
+  TeamOutlined,
+  TagsOutlined,
+  DatabaseOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,25 +60,46 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       key: "/inventory",
       icon: <AppstoreOutlined />,
       label: "Inventory",
-      // show: hasPermission("inventory.read"),
+    },
+    {
+      key: "/brands",
+      icon: <TagsOutlined />,
+      label: "Brands",
+    },
+    {
+      key: "/stores",
+      icon: <ShopOutlined />,
+      label: "Stores",
+    },
+    {
+      key: "/suppliers",
+      icon: <ApartmentOutlined />,
+      label: "Suppliers",
+    },
+    {
+      key: "/item-groups",
+      icon: <DatabaseOutlined />,
+      label: "Item Groups",
+    },
+    {
+      key: "/customers",
+      icon: <TeamOutlined />,
+      label: "Customers",
     },
     {
       key: "/pos",
       icon: <ShoppingOutlined />,
       label: "POS",
-      // show: hasPermission("pos.read"),
     },
     {
       key: "/users",
       icon: <UserOutlined />,
       label: "Users",
-      // show: hasPermission("users.read"),
     },
     {
       key: "/roles",
       icon: <SafetyOutlined />,
       label: "Roles & Permissions",
-      // show: hasPermission("roles.read"),
     },
     {
       key: "/settings",

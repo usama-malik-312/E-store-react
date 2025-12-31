@@ -1,9 +1,9 @@
-import { Form, Input, Select, Button, Space } from 'antd';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { User, CreateUserData, UpdateUserData } from '../types';
-import { useRoles } from '@/features/roles/hooks';
+import { Input, Select, Button } from "antd";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { User, CreateUserData, UpdateUserData } from "../types";
+import { useRoles } from "@/features/roles/hooks";
 
 const { Option } = Select;
 
@@ -16,23 +16,23 @@ interface UserFormProps {
 }
 
 const createUserSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  full_name: z.string().min(1, 'Full name is required'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.string().min(1, 'Role is required'),
+  email: z.string().email("Invalid email address").min(1, "Email is required"),
+  full_name: z.string().min(1, "Full name is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.string().min(1, "Role is required"),
   phone: z.string().optional(),
 });
 
 const updateUserSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  full_name: z.string().min(1, 'Full name is required'),
+  email: z.string().email("Invalid email address").min(1, "Email is required"),
+  full_name: z.string().min(1, "Full name is required"),
   password: z
     .string()
     .optional()
     .refine((val) => !val || val.length === 0 || val.length >= 6, {
-      message: 'Password must be at least 6 characters',
+      message: "Password must be at least 6 characters",
     }),
-  role: z.string().min(1, 'Role is required'),
+  role: z.string().min(1, "Role is required"),
   phone: z.string().optional(),
 });
 
@@ -40,10 +40,16 @@ type CreateUserFormData = z.infer<typeof createUserSchema>;
 type UpdateUserFormData = z.infer<typeof updateUserSchema>;
 type UserFormData = CreateUserFormData | UpdateUserFormData;
 
-export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFormProps) => {
+export const UserForm = ({
+  user,
+  onSubmit,
+  onCancel,
+  isLoading,
+  isEdit,
+}: UserFormProps) => {
   // Fetch roles for dropdown
   const { data: rolesData, isLoading: rolesLoading } = useRoles({}, 1, 100);
-  const roles = rolesData?.data || [];
+  const roles = (rolesData as any)?.data || [];
 
   const {
     control,
@@ -52,11 +58,11 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
   } = useForm<UserFormData>({
     resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema),
     defaultValues: {
-      email: user?.email || '',
-      full_name: user?.full_name || '',
-      password: '',
-      role: user?.role || '',
-      phone: user?.phone || '',
+      email: user?.email || "",
+      full_name: user?.full_name || "",
+      password: "",
+      role: user?.role || "",
+      phone: user?.phone || "",
     },
   });
 
@@ -71,7 +77,7 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
     // Only include password if it's provided (for edit) or required (for create)
     if (!isEdit) {
       (submitData as CreateUserData).password = data.password as string;
-    } else if (data.password && data.password.trim() !== '') {
+    } else if (data.password && data.password.trim() !== "") {
       (submitData as UpdateUserData).password = data.password as string;
     }
 
@@ -80,7 +86,7 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium mb-2">Email *</label>
           <Controller
@@ -91,7 +97,7 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
                 {...field}
                 size="large"
                 placeholder="Enter email"
-                status={errors.email ? 'error' : ''}
+                status={errors.email ? "error" : ""}
                 disabled={isEdit} // Email usually can't be changed
               />
             )}
@@ -111,18 +117,20 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
                 {...field}
                 size="large"
                 placeholder="Enter full name"
-                status={errors.full_name ? 'error' : ''}
+                status={errors.full_name ? "error" : ""}
               />
             )}
           />
           {errors.full_name && (
-            <p className="text-red-500 text-xs mt-1">{errors.full_name.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.full_name.message}
+            </p>
           )}
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Password {isEdit ? '(leave blank to keep current)' : '*'}
+            Password {isEdit ? "(leave blank to keep current)" : "*"}
           </label>
           <Controller
             name="password"
@@ -131,13 +139,15 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
               <Input.Password
                 {...field}
                 size="large"
-                placeholder={isEdit ? 'Enter new password' : 'Enter password'}
-                status={errors.password ? 'error' : ''}
+                placeholder={isEdit ? "Enter new password" : "Enter password"}
+                status={errors.password ? "error" : ""}
               />
             )}
           />
           {errors.password && (
-            <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -152,15 +162,17 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
                 size="large"
                 placeholder="Select role"
                 className="w-full"
-                status={errors.role ? 'error' : ''}
+                status={errors.role ? "error" : ""}
                 loading={rolesLoading}
                 showSearch
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                  (option?.children as unknown as string)
+                    ?.toLowerCase()
+                    .includes(input.toLowerCase())
                 }
               >
-                {roles.map((role) => (
+                {roles.map((role: any) => (
                   <Option key={role.id} value={role.code || role.name}>
                     {role.name}
                   </Option>
@@ -183,7 +195,7 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
                 {...field}
                 size="large"
                 placeholder="Enter phone number"
-                status={errors.phone ? 'error' : ''}
+                status={errors.phone ? "error" : ""}
               />
             )}
           />
@@ -197,11 +209,10 @@ export const UserForm = ({ user, onSubmit, onCancel, isLoading, isEdit }: UserFo
             Cancel
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? 'Update' : 'Create'} User
+            {isEdit ? "Update" : "Create"} User
           </Button>
         </div>
       </div>
     </form>
   );
 };
-

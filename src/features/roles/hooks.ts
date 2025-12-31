@@ -11,7 +11,7 @@ export const useRoles = (params: PaginationParams = {}, page: number = 1, limit:
   return useQuery({
     queryKey: ['roles', params, page, limit],
     queryFn: () => rolesApi.getRoles({ ...params, page, limit }),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

@@ -1,29 +1,43 @@
-import { useState } from 'react';
-import { Table, Button, Input, Select, Space, Tag, Popconfirm, Typography, Card, Skeleton } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
-import { useUsers, useDeleteUser } from '../hooks';
-import { UserDrawer } from '../components/UserDrawer';
-import { useCreateUser, useUpdateUser } from '../hooks';
-import { User, CreateUserData, UpdateUserData } from '../types';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useState } from "react";
+import {
+  Table,
+  Button,
+  Input,
+  Select,
+  Space,
+  Tag,
+  Popconfirm,
+  Typography,
+  Card,
+  Skeleton,
+} from "antd";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useUsers, useDeleteUser } from "../hooks";
+import { User } from "../types";
+// import { usePermissions } from "@/hooks/usePermissions";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export const UsersList = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const [limit] = useState(20);
-  const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | undefined>();
+  const [limit, setLimit] = useState(20);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
-  const { canCreate, canUpdate, canDelete } = usePermissions();
-  const canCreateUser = canCreate('user');
-  const canUpdateUser = canUpdate('user');
-  const canDeleteUser = canDelete('user');
+  // const { canCreate, canUpdate, canDelete } = usePermissions();
+  // const canCreateUser = canCreate("user");
+  // const canUpdateUser = canUpdate("user");
+  // const canDeleteUser = canDelete("user");
 
   const { data: usersData, isLoading } = useUsers(
     {
@@ -36,119 +50,101 @@ export const UsersList = () => {
   );
 
   // Extract users array and pagination from response
-  const users = usersData?.data || [];
+  const users = (usersData as any)?.data || [];
   const usersArray = Array.isArray(users) ? users : [];
 
-  const createMutation = useCreateUser();
-  const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
 
   const handleCreate = () => {
-    setEditingUser(undefined);
-    setDrawerOpen(true);
+    navigate("/users/create");
   };
 
   const handleEdit = (user: User) => {
-    setEditingUser(user);
-    setDrawerOpen(true);
+    navigate(`/users/${user.id}/edit`);
   };
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id);
   };
 
-  const handleSubmit = (formData: CreateUserData | UpdateUserData) => {
-    if (editingUser) {
-      updateMutation.mutate(
-        { id: editingUser.id, data: formData },
-        {
-          onSuccess: () => {
-            setDrawerOpen(false);
-            setEditingUser(undefined);
-          },
-        }
-      );
-    } else {
-      createMutation.mutate(formData as CreateUserData, {
-        onSuccess: () => {
-          setDrawerOpen(false);
-        },
-      });
-    }
-  };
-
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'full_name',
-      key: 'full_name',
+      title: "Name",
+      dataIndex: "full_name",
+      key: "full_name",
       sorter: true,
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
       render: (role: string) => {
         const colorMap: Record<string, string> = {
-          owner: 'purple',
-          admin: 'red',
-          manager: 'blue',
-          staff: 'green',
+          owner: "purple",
+          admin: "red",
+          manager: "blue",
+          staff: "green",
         };
-        return <Tag color={colorMap[role] || 'default'}>{role.toUpperCase()}</Tag>;
+        return (
+          <Tag color={colorMap[role] || "default"}>{role.toUpperCase()}</Tag>
+        );
       },
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => {
         const colorMap: Record<string, string> = {
-          active: 'green',
-          inactive: 'gray',
-          suspended: 'red',
+          active: "green",
+          inactive: "gray",
+          suspended: "red",
         };
-        return <Tag color={colorMap[status] || 'default'}>{status.toUpperCase()}</Tag>;
+        return (
+          <Tag color={colorMap[status] || "default"}>
+            {status.toUpperCase()}
+          </Tag>
+        );
       },
     },
     {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: (_: any, record: User) => (
         <Space>
-          {canUpdateUser && (
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-              size="small"
-            >
-              Edit
+          {/* {canUpdateUser && ( */}
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            size="small"
+          >
+            Edit
+          </Button>
+          {/* )} */}
+          {/* {canDeleteUser && ( */}
+          <Popconfirm
+            title="Are you sure you want to delete this user?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="link" danger icon={<DeleteOutlined />} size="small">
+              Delete
             </Button>
-          )}
-          {canDeleteUser && (
-            <Popconfirm
-              title="Are you sure you want to delete this user?"
-              onConfirm={() => handleDelete(record.id)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} size="small">
-                Delete
-              </Button>
-            </Popconfirm>
-          )}
+          </Popconfirm>
+          {/* )} */}
         </Space>
       ),
     },
@@ -158,11 +154,16 @@ export const UsersList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <Title level={2}>Users Management</Title>
-        {canCreateUser && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate} size="large">
-            Add User
-          </Button>
-        )}
+        {/* {canCreateUser && ( */}
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleCreate}
+          size="large"
+        >
+          Add User
+        </Button>
+        {/* )} */}
       </div>
 
       <Card>
@@ -229,31 +230,26 @@ export const UsersList = () => {
               pagination={{
                 current: page,
                 pageSize: limit,
-                total: usersData?.pagination?.total || 0,
+                total: (usersData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
-                pageSizeOptions: ['10', '20', '50', '100'],
+                pageSizeOptions: ["10", "20", "50", "100"],
                 showTotal: (total) => `Total ${total} users`,
-                onChange: (page) => setPage(page),
-                onShowSizeChange: (_, size) => {
-                  // You can add limit state if needed
+                onChange: (newPage, newPageSize) => {
+                  setPage(newPage);
+                  if (newPageSize !== limit) {
+                    setLimit(newPageSize);
+                    setPage(1); // Reset to first page when page size changes
+                  }
+                },
+                onShowSizeChange: (_, newPageSize) => {
+                  setLimit(newPageSize);
+                  setPage(1); // Reset to first page when page size changes
                 },
               }}
             />
           </motion.div>
         )}
       </Card>
-
-      <UserDrawer
-        open={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-          setEditingUser(undefined);
-        }}
-        user={editingUser}
-        onSubmit={handleSubmit}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-      />
     </div>
   );
 };
-
