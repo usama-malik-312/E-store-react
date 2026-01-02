@@ -12,27 +12,31 @@ import { useStoresDropdown } from "@/features/stores/hooks";
 import { useBrandsDropdown } from "@/features/brands/hooks";
 import { useSuppliersDropdown } from "@/features/suppliers/hooks";
 import { useItemGroupsDropdown } from "@/features/item-groups/hooks";
+import { useTranslation } from "react-i18next";
 
-const inventoryItemSchema = z.object({
-  item_name: z.string().min(1, "Item name is required"),
-  item_code: z.string().min(1, "Item code is required"),
-  store_id: z.number().min(1, "Store is required"),
-  brand_id: z.number().optional().nullable(),
-  supplier_id: z.number().optional().nullable(),
-  item_group_id: z.number().optional().nullable(),
-  selling_price: z.number().min(0, "Selling price must be positive"),
-  cost_price: z
-    .number()
-    .min(0, "Cost price must be positive")
-    .optional()
-    .nullable(),
-  stock: z.number().min(0, "Stock must be positive").optional().nullable(),
-  unit: z.string().optional(),
-  sku: z.string().optional(),
-  status: z.string().optional(),
-});
-
-type InventoryItemFormData = z.infer<typeof inventoryItemSchema>;
+const getInventoryItemSchema = (t: (key: string) => string) =>
+  z.object({
+    item_name: z.string().min(1, t("inventory.itemNameRequired")),
+    item_code: z.string().min(1, t("inventory.itemCodeRequired")),
+    store_id: z.number().min(1, t("inventory.storeRequired")),
+    brand_id: z.number().optional().nullable(),
+    supplier_id: z.number().optional().nullable(),
+    item_group_id: z.number().optional().nullable(),
+    selling_price: z.number().min(0, t("inventory.sellingPriceRequired")),
+    cost_price: z
+      .number()
+      .min(0, t("validation.positiveNumber"))
+      .optional()
+      .nullable(),
+    stock: z
+      .number()
+      .min(0, t("validation.positiveNumber"))
+      .optional()
+      .nullable(),
+    unit: z.string().optional(),
+    sku: z.string().optional(),
+    status: z.string().optional(),
+  });
 
 interface InventoryItemFormProps {
   inventoryItem?: InventoryItem;
@@ -49,10 +53,14 @@ export const InventoryItemForm = ({
   isLoading,
   isEdit,
 }: InventoryItemFormProps) => {
+  const { t } = useTranslation();
   const { data: stores = [] } = useStoresDropdown();
   const { data: brands = [] } = useBrandsDropdown();
   const { data: suppliers = [] } = useSuppliersDropdown();
   const { data: itemGroups = [] } = useItemGroupsDropdown();
+
+  const inventoryItemSchema = getInventoryItemSchema(t);
+  type InventoryItemFormData = z.infer<typeof inventoryItemSchema>;
 
   const {
     control,
@@ -128,7 +136,9 @@ export const InventoryItemForm = ({
     <form onSubmit={handleSubmit(onFormSubmit, onFormError)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Item Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.itemName")} *
+          </label>
           <Controller
             name="item_name"
             control={control}
@@ -136,7 +146,7 @@ export const InventoryItemForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter item name"
+                placeholder={t("inventory.enterItemName")}
                 status={errors.item_name ? "error" : ""}
               />
             )}
@@ -149,7 +159,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Item Code *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.itemCode")} *
+          </label>
           <Controller
             name="item_code"
             control={control}
@@ -157,7 +169,7 @@ export const InventoryItemForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter item code"
+                placeholder={t("inventory.enterItemCode")}
                 status={errors.item_code ? "error" : ""}
               />
             )}
@@ -170,7 +182,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">SKU</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.sku")}
+          </label>
           <Controller
             name="sku"
             control={control}
@@ -178,7 +192,7 @@ export const InventoryItemForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter SKU"
+                placeholder={t("inventory.enterSKU")}
                 status={errors.sku ? "error" : ""}
               />
             )}
@@ -189,7 +203,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Store *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.store")} *
+          </label>
           <Controller
             name="store_id"
             control={control}
@@ -200,7 +216,7 @@ export const InventoryItemForm = ({
                 onBlur={field.onBlur}
                 size="large"
                 className="w-full"
-                placeholder="Select store"
+                placeholder={t("inventory.selectStore")}
                 options={stores.map((store) => ({
                   label: store.name,
                   value: store.id,
@@ -217,7 +233,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Brand</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.brand")}
+          </label>
           <Controller
             name="brand_id"
             control={control}
@@ -228,7 +246,7 @@ export const InventoryItemForm = ({
                 onBlur={field.onBlur}
                 size="large"
                 className="w-full"
-                placeholder="Select brand"
+                placeholder={t("inventory.selectBrand")}
                 allowClear
                 options={brands.map((brand) => ({
                   label: brand.name,
@@ -240,7 +258,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Supplier</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.supplier")}
+          </label>
           <Controller
             name="supplier_id"
             control={control}
@@ -251,7 +271,7 @@ export const InventoryItemForm = ({
                 onBlur={field.onBlur}
                 size="large"
                 className="w-full"
-                placeholder="Select supplier"
+                placeholder={t("inventory.selectSupplier")}
                 allowClear
                 options={suppliers.map((supplier) => ({
                   label: supplier.name,
@@ -263,7 +283,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Item Group</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.itemGroup")}
+          </label>
           <Controller
             name="item_group_id"
             control={control}
@@ -274,7 +296,7 @@ export const InventoryItemForm = ({
                 onBlur={field.onBlur}
                 size="large"
                 className="w-full"
-                placeholder="Select item group"
+                placeholder={t("inventory.selectItemGroup")}
                 allowClear
                 options={itemGroups.map((group) => ({
                   label: group.name,
@@ -297,7 +319,7 @@ export const InventoryItemForm = ({
                 {...field}
                 size="large"
                 className="w-full"
-                placeholder="Enter selling price"
+                placeholder={t("inventory.enterSellingPrice")}
                 min={0}
                 step={0.01}
                 formatter={(value) =>
@@ -319,7 +341,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Cost Price</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.costPrice")}
+          </label>
           <Controller
             name="cost_price"
             control={control}
@@ -328,7 +352,7 @@ export const InventoryItemForm = ({
                 {...field}
                 size="large"
                 className="w-full"
-                placeholder="Enter cost price"
+                placeholder={t("inventory.enterCostPrice")}
                 min={0}
                 step={0.01}
                 formatter={(value) =>
@@ -344,7 +368,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Stock</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.stock")}
+          </label>
           <Controller
             name="stock"
             control={control}
@@ -353,7 +379,7 @@ export const InventoryItemForm = ({
                 {...field}
                 size="large"
                 className="w-full"
-                placeholder="Enter stock quantity"
+                placeholder={t("inventory.enterStock")}
                 min={0}
                 status={errors.stock ? "error" : ""}
               />
@@ -365,7 +391,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Unit</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.unit")}
+          </label>
           <Controller
             name="unit"
             control={control}
@@ -373,14 +401,16 @@ export const InventoryItemForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter unit (e.g., pcs, kg, etc.)"
+                placeholder={t("inventory.enterUnit")}
               />
             )}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Status</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("inventory.status")}
+          </label>
           <Controller
             name="status"
             control={control}
@@ -402,10 +432,11 @@ export const InventoryItemForm = ({
 
         <div className="md:col-span-2 flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} Item
+            {isEdit ? t("common.update") : t("common.create")}{" "}
+            {t("inventory.title").split(" ")[0]}
           </Button>
         </div>
       </div>

@@ -19,11 +19,13 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSuppliers, useDeleteSupplier } from "../hooks";
 import { Supplier } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const SuppliersList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
@@ -49,41 +51,41 @@ export const SuppliersList = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: t("suppliers.supplierName"),
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Contact Person",
+      title: t("suppliers.contactPerson"),
       dataIndex: "contact_person",
       key: "contact_person",
       render: (person: string) =>
         person || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Phone",
+      title: t("suppliers.phone"),
       dataIndex: "phone",
       key: "phone",
       render: (phone: string) =>
         phone || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Email",
+      title: t("suppliers.email"),
       dataIndex: "email",
       key: "email",
       render: (email: string) =>
         email || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Address",
+      title: t("suppliers.address"),
       dataIndex: "address",
       key: "address",
       render: (addr: string) =>
         addr || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: Supplier) => (
         <Space>
@@ -93,16 +95,16 @@ export const SuppliersList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this supplier?"
+            title={t("suppliers.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -113,21 +115,21 @@ export const SuppliersList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Suppliers Management</Title>
+        <Title level={2}>{t("suppliers.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Supplier
+          {t("suppliers.addSupplier")}
         </Button>
       </div>
 
       <Card>
         <div className="mb-4">
           <Input
-            placeholder="Search by name, contact, phone, or email..."
+            placeholder={t("suppliers.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={search}
             onChange={(e) => {
@@ -159,7 +161,7 @@ export const SuppliersList = () => {
                 total: (suppliersData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} suppliers`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("suppliers.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
@@ -179,5 +181,3 @@ export const SuppliersList = () => {
     </div>
   );
 };
-
-

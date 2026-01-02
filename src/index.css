@@ -52,3 +52,213 @@ body {
   }
 }
 
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL Layout adjustments - Override Tailwind margin classes */
+.rtl .ml-\[200px\] {
+  margin-left: 0 !important;
+  margin-right: 200px !important;
+}
+
+.rtl .ml-\[80px\] {
+  margin-left: 0 !important;
+  margin-right: 80px !important;
+}
+
+.rtl .ml-0 {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* RTL specific margin classes */
+.rtl .mr-\[200px\] {
+  margin-right: 200px !important;
+  margin-left: 0 !important;
+}
+
+.rtl .mr-\[80px\] {
+  margin-right: 80px !important;
+  margin-left: 0 !important;
+}
+
+/* Ensure main content area has proper spacing in RTL */
+.rtl .ant-layout-content {
+  margin-right: 0 !important;
+}
+
+/* Fix header spacing in RTL */
+.rtl .ant-layout-header {
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+/* RTL Text alignment */
+.rtl .text-left {
+  text-align: right;
+}
+
+.rtl .text-right {
+  text-align: left;
+}
+
+/* RTL Flexbox adjustments */
+.rtl .flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+/* RTL Input and form elements */
+.rtl input,
+.rtl textarea,
+.rtl select {
+  text-align: right;
+}
+
+/* RTL Ant Design Menu */
+.rtl .ant-menu {
+  text-align: right;
+}
+
+/* RTL Ant Design Table */
+.rtl .ant-table {
+  direction: rtl;
+}
+
+.rtl .ant-table-thead > tr > th {
+  text-align: right;
+}
+
+.rtl .ant-table-tbody > tr > td {
+  text-align: right;
+}
+
+/* RTL Ant Design Drawer */
+.rtl .ant-drawer {
+  direction: rtl;
+}
+
+.rtl .ant-drawer-content-wrapper {
+  right: 0;
+  left: auto;
+}
+
+.rtl .ant-drawer-left .ant-drawer-content-wrapper {
+  left: 0;
+  right: auto;
+}
+
+.rtl .ant-drawer-right .ant-drawer-content-wrapper {
+  right: 0;
+  left: auto;
+}
+
+/* RTL Ant Design Form */
+.rtl .ant-form-item-label {
+  text-align: right;
+}
+
+.rtl .ant-form-item-label > label {
+  direction: rtl;
+}
+
+/* RTL Ant Design Input */
+.rtl .ant-input {
+  text-align: right;
+}
+
+.rtl .ant-input-number {
+  direction: rtl;
+}
+
+.rtl .ant-select-selector {
+  text-align: right;
+}
+
+/* RTL Ant Design Menu - ensure visibility */
+.rtl .ant-menu {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl .ant-menu-item {
+  text-align: right;
+  padding-right: 20px;
+  padding-left: 16px;
+}
+
+.rtl .ant-menu-item-icon {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* RTL Layout - ensure content doesn't hide behind sidebar */
+.rtl .ant-layout {
+  direction: rtl;
+}
+
+/* RTL Space component */
+.rtl .ant-space {
+  direction: rtl;
+}
+
+/* RTL Button groups */
+.rtl .ant-btn-group {
+  direction: rtl;
+}
+
+/* Ensure drawer is visible above sidebar */
+.ant-drawer {
+  z-index: 1000 !important;
+}
+
+/* RTL Sidebar positioning */
+.rtl .ant-layout-sider {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* RTL Menu button visibility */
+.rtl .ant-layout-header {
+  direction: rtl;
+}
+
+/* Ensure menu toggle button is visible in RTL */
+.rtl .ant-btn {
+  direction: rtl;
+}
+
+/* Fix main layout container in RTL */
+.rtl .ant-layout {
+  direction: rtl;
+}
+
+/* Ensure content doesn't overlap sidebar in RTL */
+body.rtl .ant-layout {
+  margin-right: 0;
+}
+
+/* Fix spacing for main content area */
+.rtl .ant-layout-content {
+  margin-right: 0 !important;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+/* RTL Pagination */
+.rtl .ant-pagination {
+  direction: rtl;
+}
+
+.rtl .ant-pagination-prev,
+.rtl .ant-pagination-next {
+  transform: rotate(180deg);
+}
+

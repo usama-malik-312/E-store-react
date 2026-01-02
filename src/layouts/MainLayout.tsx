@@ -23,6 +23,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import classNames from "classnames";
 import { useTheme } from "@/hooks/useTheme";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const { Header, Sider, Content } = Layout;
 
@@ -37,6 +40,8 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { isRTL } = useLanguage();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -54,57 +59,57 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     {
       key: "/dashboard",
       icon: <DashboardOutlined />,
-      label: "Dashboard",
+      label: t("navigation.dashboard"),
     },
     {
       key: "/inventory",
       icon: <AppstoreOutlined />,
-      label: "Inventory",
+      label: t("navigation.inventory"),
     },
     {
       key: "/brands",
       icon: <TagsOutlined />,
-      label: "Brands",
+      label: t("navigation.brands"),
     },
     {
       key: "/stores",
       icon: <ShopOutlined />,
-      label: "Stores",
+      label: t("navigation.stores"),
     },
     {
       key: "/suppliers",
       icon: <ApartmentOutlined />,
-      label: "Suppliers",
+      label: t("navigation.suppliers"),
     },
     {
       key: "/item-groups",
       icon: <DatabaseOutlined />,
-      label: "Item Groups",
+      label: t("navigation.itemGroups"),
     },
     {
       key: "/customers",
       icon: <TeamOutlined />,
-      label: "Customers",
+      label: t("navigation.customers"),
     },
     {
       key: "/pos",
       icon: <ShoppingOutlined />,
-      label: "POS",
+      label: t("navigation.pos"),
     },
     {
       key: "/users",
       icon: <UserOutlined />,
-      label: "Users",
+      label: t("navigation.users"),
     },
     {
       key: "/roles",
       icon: <SafetyOutlined />,
-      label: "Roles & Permissions",
+      label: t("navigation.roles"),
     },
     {
       key: "/settings",
       icon: <SettingOutlined />,
-      label: "Settings",
+      label: t("navigation.settings"),
     },
   ];
 
@@ -112,12 +117,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
     {
       key: "profile",
       icon: <UserOutlined />,
-      label: "Profile",
+      label: t("navigation.profile"),
     },
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: "Logout",
+      label: t("auth.logout"),
       danger: true,
     },
   ];
@@ -158,9 +163,16 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        className={classNames("fixed left-0 top-0 bottom-0 h-screen z-50", {
+        className={classNames("fixed top-0 bottom-0 h-screen z-50", {
           "shadow-lg": isMobile && !collapsed,
+          "left-0": !isRTL,
+          "right-0": isRTL,
         })}
+        style={
+          isRTL
+            ? { right: 0, left: "auto", position: "fixed" }
+            : { left: 0, right: "auto", position: "fixed" }
+        }
         theme={theme === "dark" ? "dark" : "light"}
         breakpoint="lg"
         collapsedWidth={isMobile ? 0 : 80}
@@ -204,10 +216,19 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
       <Layout
         className={classNames("transition-all duration-200", {
-          "ml-0": isMobile || collapsed,
-          "ml-[200px]": !isMobile && !collapsed,
-          "ml-[80px]": !isMobile && collapsed,
+          "ml-0 mr-0": isMobile || collapsed,
+          "ml-[200px]": !isMobile && !collapsed && !isRTL,
+          "mr-[200px]": !isMobile && !collapsed && isRTL,
+          "ml-[80px]": !isMobile && collapsed && !isRTL,
+          "mr-[80px]": !isMobile && collapsed && isRTL,
         })}
+        style={
+          isRTL && !isMobile && !collapsed
+            ? { marginRight: "200px", marginLeft: 0 }
+            : isRTL && !isMobile && collapsed
+            ? { marginRight: "80px", marginLeft: 0 }
+            : undefined
+        }
       >
         <Header className="bg-white dark:bg-gray-800 px-4 flex items-center justify-between shadow-sm sticky top-0 z-30">
           <Button
@@ -217,6 +238,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             className="text-lg"
           />
           <Space>
+            <LanguageSwitcher />
             <Button
               type="text"
               icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
@@ -227,7 +249,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 items: userMenuItems,
                 onClick: handleMenuClick,
               }}
-              placement="bottomRight"
+              placement={isRTL ? "bottomLeft" : "bottomRight"}
             >
               <Space className="cursor-pointer">
                 <Avatar icon={<UserOutlined />} />

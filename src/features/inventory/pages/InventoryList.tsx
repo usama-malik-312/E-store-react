@@ -26,11 +26,13 @@ import { useStoresDropdown } from "@/features/stores/hooks";
 import { useBrandsDropdown } from "@/features/brands/hooks";
 import { useSuppliersDropdown } from "@/features/suppliers/hooks";
 import { useItemGroupsDropdown } from "@/features/item-groups/hooks";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const InventoryList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
@@ -76,26 +78,26 @@ export const InventoryList = () => {
 
   const columns = [
     {
-      title: "Item Code",
+      title: t("inventory.itemCode"),
       dataIndex: "item_code",
       key: "item_code",
       sorter: true,
     },
     {
-      title: "Item Name",
+      title: t("inventory.itemName"),
       dataIndex: "item_name",
       key: "item_name",
       sorter: true,
     },
     {
-      title: "Brand",
+      title: t("inventory.brand"),
       dataIndex: ["brand", "name"],
       key: "brand",
       render: (name: string) =>
         name || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Stock",
+      title: t("inventory.stock"),
       dataIndex: "stock",
       key: "stock",
       render: (stock: number, record: InventoryItem) => {
@@ -109,7 +111,7 @@ export const InventoryList = () => {
       },
     },
     {
-      title: "Selling Price",
+      title: t("inventory.sellingPrice"),
       dataIndex: "selling_price",
       key: "selling_price",
       render: (price: number | string | undefined) => {
@@ -118,7 +120,7 @@ export const InventoryList = () => {
       },
     },
     {
-      title: "Cost Price",
+      title: t("inventory.costPrice"),
       dataIndex: "cost_price",
       key: "cost_price",
       render: (price: number | string | undefined) => {
@@ -131,17 +133,19 @@ export const InventoryList = () => {
       },
     },
     {
-      title: "Status",
+      title: t("inventory.status"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
         <Tag color={status === "active" ? "green" : "red"}>
-          {status || "active"}
+          {status === "active"
+            ? t("inventory.active")
+            : t("inventory.inactive")}
         </Tag>
       ),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: InventoryItem) => (
         <Space>
@@ -151,16 +155,16 @@ export const InventoryList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this item?"
+            title={t("inventory.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -171,7 +175,7 @@ export const InventoryList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Inventory Management</Title>
+        <Title level={2}>{t("inventory.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -179,14 +183,14 @@ export const InventoryList = () => {
           size="large"
           disabled={!filters.store_id}
         >
-          Add Item
+          {t("inventory.addItem")}
         </Button>
       </div>
 
       <Card>
         {!filters.store_id && (
           <Alert
-            message="Please select a store to view inventory items"
+            message={t("inventory.selectStore")}
             type="info"
             showIcon
             className="mb-4"
@@ -195,11 +199,13 @@ export const InventoryList = () => {
 
         <div className="mb-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Store *</label>
+            <label className="block text-sm font-medium mb-2">
+              {t("inventory.store")} *
+            </label>
             <Select
               size="large"
               className="w-full max-w-md"
-              placeholder="Select a store"
+              placeholder={t("inventory.selectStore")}
               value={filters.store_id}
               onChange={handleStoreChange}
               options={stores.map((store) => ({
@@ -213,7 +219,7 @@ export const InventoryList = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <Input
-                  placeholder="Search by name, code, or SKU..."
+                  placeholder={t("inventory.searchPlaceholder")}
                   prefix={<SearchOutlined />}
                   value={search}
                   onChange={(e) => {
@@ -229,13 +235,13 @@ export const InventoryList = () => {
                 <Select
                   size="large"
                   className="w-full"
-                  placeholder="Filter by Status"
+                  placeholder={t("inventory.filterByStatus")}
                   allowClear
                   value={filters.status}
                   onChange={(value) => handleFilterChange("status", value)}
                   options={[
-                    { label: "Active", value: "active" },
-                    { label: "Inactive", value: "inactive" },
+                    { label: t("inventory.active"), value: "active" },
+                    { label: t("inventory.inactive"), value: "inactive" },
                   ]}
                 />
               </div>
@@ -244,7 +250,7 @@ export const InventoryList = () => {
                 <Select
                   size="large"
                   className="w-full"
-                  placeholder="Filter by Brand"
+                  placeholder={t("inventory.filterByBrand")}
                   allowClear
                   value={filters.brand_id}
                   onChange={(value) => handleFilterChange("brand_id", value)}
@@ -259,7 +265,7 @@ export const InventoryList = () => {
                 <Select
                   size="large"
                   className="w-full"
-                  placeholder="Filter by Supplier"
+                  placeholder={t("inventory.filterBySupplier")}
                   allowClear
                   value={filters.supplier_id}
                   onChange={(value) => handleFilterChange("supplier_id", value)}
@@ -274,7 +280,7 @@ export const InventoryList = () => {
                 <Select
                   size="large"
                   className="w-full"
-                  placeholder="Filter by Item Group"
+                  placeholder={t("inventory.filterByItemGroup")}
                   allowClear
                   value={filters.item_group_id}
                   onChange={(value) =>
@@ -309,7 +315,10 @@ export const InventoryList = () => {
                 total: (inventoryData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} items`,
+                showTotal: (total) =>
+                  `${t("common.total")} ${total} ${t(
+                    "inventory.title"
+                  ).toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {

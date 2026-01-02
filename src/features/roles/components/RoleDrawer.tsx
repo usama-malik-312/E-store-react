@@ -2,6 +2,8 @@ import { Drawer } from 'antd';
 import { motion } from 'framer-motion';
 import { RoleForm } from './RoleForm';
 import { Role, CreateRoleData, UpdateRoleData, Permission } from '../types';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 interface RoleDrawerProps {
   open: boolean;
@@ -21,6 +23,8 @@ export const RoleDrawer = ({
   isLoading,
 }: RoleDrawerProps) => {
   const isEdit = !!role;
+  const { isRTL } = useLanguage();
+  const { t } = useTranslation();
 
   const handleSubmit = (data: CreateRoleData | UpdateRoleData) => {
     onSubmit(data);
@@ -28,15 +32,16 @@ export const RoleDrawer = ({
 
   return (
     <Drawer
-      title={isEdit ? 'Edit Role' : 'Add New Role'}
-      placement="right"
+      title={isEdit ? t('roles.editRole') : t('roles.createRole')}
+      placement={isRTL ? 'left' : 'right'}
       onClose={onClose}
       open={open}
       width={600}
       destroyOnClose
+      zIndex={1000}
     >
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
+        initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
@@ -52,4 +57,3 @@ export const RoleDrawer = ({
     </Drawer>
   );
 };
-

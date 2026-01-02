@@ -9,13 +9,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/Card";
 import { InputField } from "@/components/ui/InputField";
 import { Button } from "@/components/ui/Button";
-
-const loginSchema = z.object({
-  identifier: z.string().min(1, "Email or username is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Login = () => {
   const { login, isLoggingIn, isAuthenticated } = useAuth();
@@ -24,6 +19,15 @@ export const Login = () => {
   const prevIsLoggingInRef = useRef(isLoggingIn);
   const hasRedirectedRef = useRef(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
+
+  const loginSchema = z.object({
+    identifier: z.string().min(1, t("auth.emailOrUsername") + " " + t("validation.required")),
+    password: z.string().min(6, t("validation.minLength").replace("{{min}}", "6")),
+  });
+
+  type LoginFormData = z.infer<typeof loginSchema>;
 
   const {
     control,
@@ -96,7 +100,7 @@ export const Login = () => {
               Electric Store
             </h1>
             <p className="text-sm text-gray-500 font-medium">
-              POS & Inventory Management
+              {t("navigation.pos")} & {t("navigation.inventory")} {t("navigation.settings")}
             </p>
           </div>
 
@@ -108,9 +112,9 @@ export const Login = () => {
               render={({ field }) => (
                 <InputField
                   {...field}
-                  label="Email / Username"
+                  label={t("auth.emailOrUsername")}
                   type="text"
-                  placeholder="Enter your email or username"
+                  placeholder={t("auth.enterEmailOrUsername")}
                   error={errors.identifier?.message}
                   required
                 />
@@ -120,7 +124,7 @@ export const Login = () => {
             {/* Password Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                Password
+                {t("auth.password")}
                 <span className="text-red-500 ml-1">*</span>
               </label>
               <div className="relative">
@@ -131,7 +135,7 @@ export const Login = () => {
                     <input
                       {...field}
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder={t("auth.enterPassword")}
                       className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 dark:border-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 shadow-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-blue-500 focus:border-blue-500"
                     />
                   )}
@@ -196,7 +200,7 @@ export const Login = () => {
                 }}
                 className="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium"
               >
-                Forgot password?
+                {t("auth.forgotPassword")}
               </a>
             </div>
 
@@ -207,7 +211,7 @@ export const Login = () => {
               className="w-full py-3 rounded-xl text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
               isLoading={isLoggingIn}
             >
-              Login
+              {t("auth.login")}
             </Button>
           </form>
         </Card>
