@@ -2,6 +2,7 @@ import { Input, Button, Select, InputNumber } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useEffect } from "react";
 import {
   InventoryItem,
   CreateInventoryItemData,
@@ -57,26 +58,50 @@ export const InventoryItemForm = ({
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<InventoryItemFormData>({
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
-      item_name: inventoryItem?.item_name || "",
-      item_code: inventoryItem?.item_code || "",
-      store_id: inventoryItem?.store_id || undefined,
-      brand_id: inventoryItem?.brand_id || null,
-      supplier_id: inventoryItem?.supplier_id || null,
-      item_group_id: inventoryItem?.item_group_id || null,
-      selling_price: inventoryItem?.selling_price || 0,
-      cost_price: inventoryItem?.cost_price || null,
-      stock: inventoryItem?.stock || null,
-      unit: inventoryItem?.unit || "",
-      sku: inventoryItem?.sku || "",
-      status: inventoryItem?.status || "active",
+      item_name: "",
+      item_code: "",
+      store_id: undefined,
+      brand_id: null,
+      supplier_id: null,
+      item_group_id: null,
+      selling_price: 0,
+      cost_price: null,
+      stock: null,
+      unit: "",
+      sku: "",
+      status: "active",
     },
   });
 
+  // Reset form when inventoryItem data loads (for edit mode)
+  useEffect(() => {
+    if (inventoryItem) {
+      reset({
+        item_name: inventoryItem.item_name || "",
+        item_code: inventoryItem.item_code || "",
+        store_id: inventoryItem.store_id || undefined,
+        brand_id: inventoryItem.brand_id || null,
+        supplier_id: inventoryItem.supplier_id || null,
+        item_group_id: inventoryItem.item_group_id || null,
+        selling_price: inventoryItem.selling_price || 0,
+        cost_price: inventoryItem.cost_price || null,
+        stock: inventoryItem.stock || null,
+        unit: inventoryItem.unit || "",
+        sku: inventoryItem.sku || "",
+        status: inventoryItem.status || "active",
+      });
+    }
+  }, [inventoryItem, reset]);
+
   const onFormSubmit = (data: InventoryItemFormData) => {
-    onSubmit({
+    console.log("Form Data===>", data);
+    console.log("Form Errors===>", errors);
+
+    const submitData = {
       item_name: data.item_name,
       item_code: data.item_code,
       store_id: data.store_id,
@@ -89,11 +114,18 @@ export const InventoryItemForm = ({
       unit: data.unit || undefined,
       sku: data.sku || undefined,
       status: data.status || undefined,
-    });
+    };
+
+    console.log("Submitting data===>", submitData);
+    onSubmit(submitData);
+  };
+
+  const onFormError = (errors: any) => {
+    console.log("Form validation errors===>", errors);
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)}>
+    <form onSubmit={handleSubmit(onFormSubmit, onFormError)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-2">Item Name *</label>
@@ -163,7 +195,9 @@ export const InventoryItemForm = ({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 placeholder="Select store"
@@ -189,7 +223,9 @@ export const InventoryItemForm = ({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 placeholder="Select brand"
@@ -210,7 +246,9 @@ export const InventoryItemForm = ({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 placeholder="Select supplier"
@@ -231,7 +269,9 @@ export const InventoryItemForm = ({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 placeholder="Select item group"
@@ -346,7 +386,9 @@ export const InventoryItemForm = ({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 options={[

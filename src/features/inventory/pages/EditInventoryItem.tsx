@@ -13,17 +13,27 @@ export const EditInventoryItem = () => {
   const { id } = useParams<{ id: string }>();
   const itemId = id ? parseInt(id) : null;
 
-  const { data: inventoryItem, isLoading: itemLoading } = useInventoryItem(itemId);
+  const { data: inventoryItem, isLoading: itemLoading } =
+    useInventoryItem(itemId);
   const updateMutation = useUpdateInventoryItem();
 
   const handleSubmit = (data: UpdateInventoryItemData) => {
-    if (!itemId) return;
+    console.log("handleSubmit called with data:", data);
+    if (!itemId) {
+      console.error("Item ID is missing");
+      return;
+    }
 
+    console.log("Calling mutation with id:", itemId, "data:", data);
     updateMutation.mutate(
       { id: itemId, data },
       {
         onSuccess: () => {
+          console.log("Update successful, navigating...");
           navigate("/inventory");
+        },
+        onError: (error) => {
+          console.error("Update error:", error);
         },
       }
     );
@@ -88,5 +98,3 @@ export const EditInventoryItem = () => {
     </div>
   );
 };
-
-
