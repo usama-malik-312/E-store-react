@@ -17,7 +17,6 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  WarningOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -92,7 +91,8 @@ export const InventoryList = () => {
       title: "Brand",
       dataIndex: ["brand", "name"],
       key: "brand",
-      render: (name: string) => name || <span className="text-gray-400">-</span>,
+      render: (name: string) =>
+        name || <span className="text-gray-400">-</span>,
     },
     {
       title: "Stock",
@@ -112,14 +112,23 @@ export const InventoryList = () => {
       title: "Selling Price",
       dataIndex: "selling_price",
       key: "selling_price",
-      render: (price: number) => `$${price.toFixed(2)}`,
+      render: (price: number | string | undefined) => {
+        const numPrice = typeof price === "string" ? parseFloat(price) : price;
+        return numPrice && !isNaN(numPrice) ? `$${numPrice.toFixed(2)}` : "-";
+      },
     },
     {
       title: "Cost Price",
       dataIndex: "cost_price",
       key: "cost_price",
-      render: (price: number) =>
-        price ? `$${price.toFixed(2)}` : <span className="text-gray-400">-</span>,
+      render: (price: number | string | undefined) => {
+        const numPrice = typeof price === "string" ? parseFloat(price) : price;
+        return numPrice && !isNaN(numPrice) ? (
+          `$${numPrice.toFixed(2)}`
+        ) : (
+          <span className="text-gray-400">-</span>
+        );
+      },
     },
     {
       title: "Status",
@@ -268,7 +277,9 @@ export const InventoryList = () => {
                   placeholder="Filter by Item Group"
                   allowClear
                   value={filters.item_group_id}
-                  onChange={(value) => handleFilterChange("item_group_id", value)}
+                  onChange={(value) =>
+                    handleFilterChange("item_group_id", value)
+                  }
                   options={itemGroups.map((group) => ({
                     label: group.name,
                     value: group.id,
@@ -318,4 +329,3 @@ export const InventoryList = () => {
     </div>
   );
 };
-

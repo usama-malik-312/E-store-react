@@ -23,7 +23,7 @@ export const inventoryApi = {
       totalPages: number;
     };
   }> => {
-    const response = await axiosInstance.get<ApiResponse<InventoryItem[]>>("/inventory", {
+    const response = await axiosInstance.get<ApiResponse<any[]>>("/inventory", {
       params: {
         ...filters,
         page,
@@ -32,28 +32,71 @@ export const inventoryApi = {
         sort: filters.sort || "item_name:ASC",
       },
     });
-    return unwrapPaginatedResponse(response.data);
+    const result = unwrapPaginatedResponse(response.data);
+    // Transform price to selling_price if backend returns 'price'
+    const transformedData = result.data.map((item: any) => {
+      const sellingPrice = item.selling_price ?? item.price;
+      return {
+        ...item,
+        selling_price: sellingPrice ? Number(sellingPrice) : 0,
+      };
+    });
+    return {
+      ...result,
+      data: transformedData,
+    };
   },
 
   getInventoryItemById: async (id: number | string): Promise<InventoryItem> => {
-    const response = await axiosInstance.get<ApiResponse<InventoryItem>>(`/inventory/${id}`);
-    return unwrapResponse(response.data);
+    const response = await axiosInstance.get<ApiResponse<any>>(`/inventory/${id}`);
+    const data = unwrapResponse(response.data);
+    // Transform price to selling_price if backend returns 'price'
+    const sellingPrice = data.selling_price ?? data.price;
+    return {
+      ...data,
+      selling_price: sellingPrice ? Number(sellingPrice) : 0,
+    };
   },
 
   createInventoryItem: async (data: CreateInventoryItemData): Promise<InventoryItem> => {
-    const response = await axiosInstance.post<ApiResponse<InventoryItem>>("/inventory", data);
-    return unwrapResponse(response.data);
+    // Transform selling_price to price for backend API
+    const { selling_price, ...rest } = data;
+    const payload = {
+      ...rest,
+      price: selling_price,
+    };
+    const response = await axiosInstance.post<ApiResponse<any>>("/inventory", payload);
+    const result = unwrapResponse(response.data);
+    // Transform price to selling_price if backend returns 'price'
+    const sellingPrice = result.selling_price ?? result.price;
+    return {
+      ...result,
+      selling_price: sellingPrice ? Number(sellingPrice) : 0,
+    };
   },
 
   updateInventoryItem: async (
     id: number | string,
     data: UpdateInventoryItemData
   ): Promise<InventoryItem> => {
-    const response = await axiosInstance.put<ApiResponse<InventoryItem>>(
+    // Transform selling_price to price for backend API if present
+    const payload = data.selling_price !== undefined
+      ? (() => {
+          const { selling_price, ...rest } = data;
+          return { ...rest, price: selling_price };
+        })()
+      : data;
+    const response = await axiosInstance.put<ApiResponse<any>>(
       `/inventory/${id}`,
-      data
+      payload
     );
-    return unwrapResponse(response.data);
+    const result = unwrapResponse(response.data);
+    // Transform price to selling_price if backend returns 'price'
+    const sellingPrice = result.selling_price ?? result.price;
+    return {
+      ...result,
+      selling_price: sellingPrice ? Number(sellingPrice) : 0,
+    };
   },
 
   deleteInventoryItem: async (id: number | string): Promise<void> => {
@@ -82,7 +125,7 @@ export const inventoryApi = {
       totalPages: number;
     };
   }> => {
-    const response = await axiosInstance.get<ApiResponse<LowStockItem[]>>(
+    const response = await axiosInstance.get<ApiResponse<any[]>>(
       "/inventory/low-stock",
       {
         params: {
@@ -91,7 +134,20 @@ export const inventoryApi = {
         },
       }
     );
-    return unwrapPaginatedResponse(response.data);
+    const result = unwrapPaginatedResponse(response.data);
+    // Transform price to selling_price if backend returns 'price'
+    const transformedData = result.data.map((item: any) => {
+      const sellingPrice = item.selling_price ?? item.price;
+      return {
+        ...item,
+        selling_price: sellingPrice ? Number(sellingPrice) : 0,
+      };
+    });
+    return {
+      ...result,
+      data: transformedData,
+    };
   },
 };
+
 

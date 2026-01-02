@@ -2,7 +2,11 @@ import { Input, Button, Select, InputNumber } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { InventoryItem, CreateInventoryItemData, UpdateInventoryItemData } from "../types";
+import {
+  InventoryItem,
+  CreateInventoryItemData,
+  UpdateInventoryItemData,
+} from "../types";
 import { useStoresDropdown } from "@/features/stores/hooks";
 import { useBrandsDropdown } from "@/features/brands/hooks";
 import { useSuppliersDropdown } from "@/features/suppliers/hooks";
@@ -16,7 +20,11 @@ const inventoryItemSchema = z.object({
   supplier_id: z.number().optional().nullable(),
   item_group_id: z.number().optional().nullable(),
   selling_price: z.number().min(0, "Selling price must be positive"),
-  cost_price: z.number().min(0, "Cost price must be positive").optional().nullable(),
+  cost_price: z
+    .number()
+    .min(0, "Cost price must be positive")
+    .optional()
+    .nullable(),
   stock: z.number().min(0, "Stock must be positive").optional().nullable(),
   unit: z.string().optional(),
   sku: z.string().optional(),
@@ -102,7 +110,9 @@ export const InventoryItemForm = ({
             )}
           />
           {errors.item_name && (
-            <p className="text-red-500 text-xs mt-1">{errors.item_name.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.item_name.message}
+            </p>
           )}
         </div>
 
@@ -121,7 +131,9 @@ export const InventoryItemForm = ({
             )}
           />
           {errors.item_code && (
-            <p className="text-red-500 text-xs mt-1">{errors.item_code.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.item_code.message}
+            </p>
           )}
         </div>
 
@@ -164,7 +176,9 @@ export const InventoryItemForm = ({
             )}
           />
           {errors.store_id && (
-            <p className="text-red-500 text-xs mt-1">{errors.store_id.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.store_id.message}
+            </p>
           )}
         </div>
 
@@ -232,7 +246,9 @@ export const InventoryItemForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Selling Price *</label>
+          <label className="block text-sm font-medium mb-2">
+            Selling Price *
+          </label>
           <Controller
             name="selling_price"
             control={control}
@@ -244,14 +260,21 @@ export const InventoryItemForm = ({
                 placeholder="Enter selling price"
                 min={0}
                 step={0.01}
-                formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                formatter={(value) =>
+                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => {
+                  const parsed = value!.replace(/\$\s?|(,*)/g, "");
+                  return parsed ? parseFloat(parsed) : 0;
+                }}
                 status={errors.selling_price ? "error" : ""}
               />
             )}
           />
           {errors.selling_price && (
-            <p className="text-red-500 text-xs mt-1">{errors.selling_price.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.selling_price.message}
+            </p>
           )}
         </div>
 
@@ -268,8 +291,13 @@ export const InventoryItemForm = ({
                 placeholder="Enter cost price"
                 min={0}
                 step={0.01}
-                formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                parser={(value) => value!.replace(/\$\s?|(,*)/g, "")}
+                formatter={(value) =>
+                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => {
+                  const parsed = value!.replace(/\$\s?|(,*)/g, "");
+                  return parsed ? parseFloat(parsed) : 0;
+                }}
               />
             )}
           />
@@ -342,4 +370,3 @@ export const InventoryItemForm = ({
     </form>
   );
 };
-

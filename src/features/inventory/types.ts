@@ -64,3 +64,4 @@ export interface LowStockItem extends InventoryItem {
   threshold?: number;
 }
 
+
