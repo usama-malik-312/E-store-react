@@ -22,25 +22,20 @@ import { useCreateRole, useUpdateRole } from "../hooks";
 import { usePermissions as usePermissionsList } from "../hooks";
 import { RoleDrawer } from "../components/RoleDrawer";
 import { Role, CreateRoleData, UpdateRoleData } from "../types";
-// import { usePermissions } from '@/hooks/usePermissions';
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const RolesList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | undefined>();
-
-  // const { canCreate, canUpdate, canDelete } = usePermissions();
-  // const canCreateRole = canCreate('role');
-  // const canUpdateRole = canUpdate('role');
-  // const canDeleteRole = canDelete('role');
 
   const { data: rolesData, isLoading: rolesLoading } = useRoles();
   const { data: permissions, isLoading: permissionsLoading } =
     usePermissionsList();
 
-  // Extract roles array from paginated response
   const roles = (rolesData as any)?.data || [];
   const rolesArray = Array.isArray(roles) ? roles : [];
 
@@ -84,70 +79,66 @@ export const RolesList = () => {
 
   const columns = [
     {
-      title: "Role Name",
+      title: t("roles.roleName"),
       dataIndex: "name",
       key: "name",
       sorter: (a: Role, b: Role) => a.name.localeCompare(b.name),
     },
     {
-      title: "Description",
+      title: t("common.description"),
       dataIndex: "description",
       key: "description",
       render: (desc: string) =>
-        desc || <span className="text-gray-400">No description</span>,
+        desc || <span className="text-gray-400">{t("common.noDescription")}</span>,
     },
     {
-      title: "Total Permissions Assigned",
+      title: t("roles.totalPermissionsAssigned"),
       dataIndex: "permissions",
       key: "permissions",
-      render: (permissions: any[]) => (
-        <div className="flex items-center gap-2">
-          <Badge count={permissions?.length || 0} showZero color="blue" />
-          <span className="text-gray-600 font-medium">
-            {permissions?.length || 0} permission
-            {permissions?.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-      ),
+      render: (permissions: any[]) => {
+        const count = permissions?.length || 0;
+        return (
+          <div className="flex items-center gap-2">
+            <Badge count={count} showZero color="blue" />
+            <span className="text-gray-600 font-medium">
+              {count} {count === 1 ? t("common.permission") : t("common.permissions")}
+            </span>
+          </div>
+        );
+      },
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: Role) => (
         <Space>
-          {/* {canUpdateRole && ( */}
-          <>
-            <Button
-              type="link"
-              icon={<SafetyOutlined />}
-              onClick={() => navigate(`/roles/${record.id}/permissions`)}
-              size="small"
-            >
-              Edit Permissions
-            </Button>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-              size="small"
-            >
-              Edit
-            </Button>
-          </>
-          {/* )} */}
-          {/* {canDeleteRole && ( */}
+          <Button
+            type="link"
+            icon={<SafetyOutlined />}
+            onClick={() => navigate(`/roles/${record.id}/permissions`)}
+            size="small"
+          >
+            {t("roles.editPermissions")}
+          </Button>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            size="small"
+          >
+            {t("common.edit")}
+          </Button>
           <Popconfirm
-            title="Are you sure you want to delete this role?"
-            description="Users with this role will need to be reassigned."
+            title={t("roles.deleteConfirm")}
+            description={t("roles.deleteDescription")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
-          {/* )} */}
         </Space>
       ),
     },
@@ -156,7 +147,7 @@ export const RolesList = () => {
   if (permissionsLoading) {
     return (
       <div>
-        <Title level={2}>Roles & Permissions</Title>
+        <Title level={2}>{t("roles.title")}</Title>
         <Card>
           <Skeleton active paragraph={{ rows: 8 }} />
         </Card>
@@ -167,17 +158,15 @@ export const RolesList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Roles & Permissions</Title>
-        {/* {canCreateRole && ( */}
+        <Title level={2}>{t("roles.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Role
+          {t("roles.addRole")}
         </Button>
-        {/* )} */}
       </div>
 
       <Card>
@@ -197,7 +186,7 @@ export const RolesList = () => {
               pagination={{
                 pageSize: 20,
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} roles`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("roles.title").toLowerCase()}`,
               }}
             />
           </motion.div>

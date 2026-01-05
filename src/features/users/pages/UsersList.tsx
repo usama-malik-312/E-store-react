@@ -21,23 +21,19 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useUsers, useDeleteUser } from "../hooks";
 import { User } from "../types";
-// import { usePermissions } from "@/hooks/usePermissions";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export const UsersList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
-
-  // const { canCreate, canUpdate, canDelete } = usePermissions();
-  // const canCreateUser = canCreate("user");
-  // const canUpdateUser = canUpdate("user");
-  // const canDeleteUser = canDelete("user");
 
   const { data: usersData, isLoading } = useUsers(
     {
@@ -49,7 +45,6 @@ export const UsersList = () => {
     limit
   );
 
-  // Extract users array and pagination from response
   const users = (usersData as any)?.data || [];
   const usersArray = Array.isArray(users) ? users : [];
 
@@ -69,18 +64,18 @@ export const UsersList = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: t("users.fullName"),
       dataIndex: "full_name",
       key: "full_name",
       sorter: true,
     },
     {
-      title: "Email",
+      title: t("common.email"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Role",
+      title: t("users.role"),
       dataIndex: "role",
       key: "role",
       render: (role: string) => {
@@ -96,7 +91,7 @@ export const UsersList = () => {
       },
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => {
@@ -107,44 +102,40 @@ export const UsersList = () => {
         };
         return (
           <Tag color={colorMap[status] || "default"}>
-            {status.toUpperCase()}
+            {status === "active" ? t("inventory.active") : status === "inactive" ? t("inventory.inactive") : status.toUpperCase()}
           </Tag>
         );
       },
     },
     {
-      title: "Created At",
+      title: t("common.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: User) => (
         <Space>
-          {/* {canUpdateUser && ( */}
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
-          {/* )} */}
-          {/* {canDeleteUser && ( */}
           <Popconfirm
-            title="Are you sure you want to delete this user?"
+            title={t("users.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
-          {/* )} */}
         </Space>
       ),
     },
@@ -153,24 +144,22 @@ export const UsersList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Users Management</Title>
-        {/* {canCreateUser && ( */}
+        <Title level={2}>{t("users.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add User
+          {t("users.addUser")}
         </Button>
-        {/* )} */}
       </div>
 
       <Card>
         <div className="mb-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
-              placeholder="Search by name or email..."
+              placeholder={t("users.searchPlaceholder")}
               prefix={<SearchOutlined />}
               value={search}
               onChange={(e) => {
@@ -181,7 +170,7 @@ export const UsersList = () => {
               allowClear
             />
             <Select
-              placeholder="Filter by role"
+              placeholder={t("users.filterByRole")}
               value={roleFilter}
               onChange={(value) => {
                 setRoleFilter(value);
@@ -197,7 +186,7 @@ export const UsersList = () => {
               <Option value="staff">Staff</Option>
             </Select>
             <Select
-              placeholder="Filter by status"
+              placeholder={t("users.filterByStatus")}
               value={statusFilter}
               onChange={(value) => {
                 setStatusFilter(value);
@@ -207,8 +196,8 @@ export const UsersList = () => {
               allowClear
               className="w-full"
             >
-              <Option value="active">Active</Option>
-              <Option value="inactive">Inactive</Option>
+              <Option value="active">{t("inventory.active")}</Option>
+              <Option value="inactive">{t("inventory.inactive")}</Option>
               <Option value="suspended">Suspended</Option>
             </Select>
           </div>
@@ -233,17 +222,17 @@ export const UsersList = () => {
                 total: (usersData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} users`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("users.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
                     setLimit(newPageSize);
-                    setPage(1); // Reset to first page when page size changes
+                    setPage(1);
                   }
                 },
                 onShowSizeChange: (_, newPageSize) => {
                   setLimit(newPageSize);
-                  setPage(1); // Reset to first page when page size changes
+                  setPage(1);
                 },
               }}
             />

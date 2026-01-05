@@ -3,16 +3,15 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Store, CreateStoreData, UpdateStoreData } from "../types";
+import { useTranslation } from "react-i18next";
 
-const storeSchema = z.object({
-  name: z.string().min(1, "Store name is required"),
+const getStoreSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t("stores.storeNameRequired")),
   address: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  email: z.string().email(t("validation.emailInvalid")).optional().or(z.literal("")),
   status: z.string().optional(),
 });
-
-type StoreFormData = z.infer<typeof storeSchema>;
 
 interface StoreFormProps {
   store?: Store;
@@ -29,6 +28,10 @@ export const StoreForm = ({
   isLoading,
   isEdit,
 }: StoreFormProps) => {
+  const { t } = useTranslation();
+  const storeSchema = getStoreSchema(t);
+  type StoreFormData = z.infer<typeof storeSchema>;
+
   const {
     control,
     handleSubmit,
@@ -58,7 +61,9 @@ export const StoreForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Store Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("stores.storeName")} *
+          </label>
           <Controller
             name="name"
             control={control}
@@ -66,7 +71,7 @@ export const StoreForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter store name"
+                placeholder={t("stores.enterStoreName")}
                 status={errors.name ? "error" : ""}
               />
             )}
@@ -77,7 +82,9 @@ export const StoreForm = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Address</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.address")}
+          </label>
           <Controller
             name="address"
             control={control}
@@ -85,7 +92,7 @@ export const StoreForm = ({
               <Input.TextArea
                 {...field}
                 size="large"
-                placeholder="Enter store address"
+                placeholder={t("stores.enterAddress")}
                 rows={3}
                 status={errors.address ? "error" : ""}
               />
@@ -97,7 +104,9 @@ export const StoreForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Phone</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.phone")}
+          </label>
           <Controller
             name="phone"
             control={control}
@@ -105,7 +114,7 @@ export const StoreForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter phone number"
+                placeholder={t("stores.enterPhone")}
                 status={errors.phone ? "error" : ""}
               />
             )}
@@ -116,7 +125,9 @@ export const StoreForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Email</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.email")}
+          </label>
           <Controller
             name="email"
             control={control}
@@ -125,7 +136,7 @@ export const StoreForm = ({
                 {...field}
                 type="email"
                 size="large"
-                placeholder="Enter email address"
+                placeholder={t("stores.enterEmail")}
                 status={errors.email ? "error" : ""}
               />
             )}
@@ -136,18 +147,22 @@ export const StoreForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Status</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.status")}
+          </label>
           <Controller
             name="status"
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
                 className="w-full"
                 options={[
-                  { label: "Active", value: "active" },
-                  { label: "Inactive", value: "inactive" },
+                  { label: t("inventory.active"), value: "active" },
+                  { label: t("inventory.inactive"), value: "inactive" },
                 ]}
               />
             )}
@@ -156,15 +171,13 @@ export const StoreForm = ({
 
         <div className="md:col-span-2 flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} Store
+            {isEdit ? t("common.update") : t("common.create")} {t("stores.title").split(" ")[0]}
           </Button>
         </div>
       </div>
     </form>
   );
 };
-
-

@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import { BrandForm } from "../components/BrandForm";
 import { useCreateBrand } from "../hooks";
 import { CreateBrandData } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const CreateBrand = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const createMutation = useCreateBrand();
 
   const handleSubmit = (data: CreateBrandData) => {
@@ -38,10 +40,10 @@ export const CreateBrand = () => {
             type="text"
             size="large"
           >
-            Back
+            {t("common.back")}
           </Button>
           <Title level={2} className="mb-0">
-            Create New Brand
+            {t("brands.createBrand")}
           </Title>
         </div>
 

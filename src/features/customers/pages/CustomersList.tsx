@@ -21,11 +21,13 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCustomers, useDeleteCustomer } from "../hooks";
 import { Customer } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const CustomersList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
@@ -61,44 +63,44 @@ export const CustomersList = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: t("common.name"),
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Customer Code",
+      title: t("customers.customerCode"),
       dataIndex: "customer_code",
       key: "customer_code",
       render: (code: string) =>
         code || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Email",
+      title: t("common.email"),
       dataIndex: "email",
       key: "email",
       render: (email: string) =>
         email || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Phone",
+      title: t("common.phone"),
       dataIndex: "phone",
       key: "phone",
       render: (phone: string) =>
         phone || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
         <Tag color={status === "active" ? "green" : "red"}>
-          {status || "active"}
+          {status === "active" ? t("inventory.active") : t("inventory.inactive")}
         </Tag>
       ),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: Customer) => (
         <Space>
@@ -108,16 +110,16 @@ export const CustomersList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this customer?"
+            title={t("customers.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -128,14 +130,14 @@ export const CustomersList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Customers Management</Title>
+        <Title level={2}>{t("customers.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Customer
+          {t("customers.addCustomer")}
         </Button>
       </div>
 
@@ -144,15 +146,15 @@ export const CustomersList = () => {
           activeKey={status}
           onChange={handleStatusChange}
           items={[
-            { key: "active", label: "Active Customers" },
-            { key: "inactive", label: "Inactive Customers" },
+            { key: "active", label: t("customers.activeCustomers") },
+            { key: "inactive", label: t("customers.inactiveCustomers") },
           ]}
           className="mb-4"
         />
 
         <div className="mb-4">
           <Input
-            placeholder="Search by name, email, phone, or customer code..."
+            placeholder={t("customers.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={search}
             onChange={(e) => {
@@ -184,7 +186,7 @@ export const CustomersList = () => {
                 total: (customersData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} customers`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("customers.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
@@ -204,5 +206,3 @@ export const CustomersList = () => {
     </div>
   );
 };
-
-

@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import { BrandForm } from "../components/BrandForm";
 import { useUpdateBrand, useBrand } from "../hooks";
 import { UpdateBrandData } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const EditBrand = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const brandId = id ? parseInt(id) : null;
 
@@ -45,9 +47,9 @@ export const EditBrand = () => {
     return (
       <div className="w-full">
         <Card>
-          <Title level={3}>Brand not found</Title>
+          <Title level={3}>{t("brands.title")} {t("messages.notFound")}</Title>
           <Button onClick={handleCancel} className="mt-4">
-            Back to Brands
+            {t("common.back")} {t("brands.title")}
           </Button>
         </Card>
       </div>
@@ -68,10 +70,10 @@ export const EditBrand = () => {
             type="text"
             size="large"
           >
-            Back
+            {t("common.back")}
           </Button>
           <Title level={2} className="mb-0">
-            Edit Brand: {brand.name}
+            {t("brands.editBrand")}: {brand.name}
           </Title>
         </div>
 

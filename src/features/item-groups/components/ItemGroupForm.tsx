@@ -3,13 +3,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ItemGroup, CreateItemGroupData, UpdateItemGroupData } from "../types";
+import { useTranslation } from "react-i18next";
 
-const itemGroupSchema = z.object({
-  group_name: z.string().min(1, "Group name is required"),
+const getItemGroupSchema = (t: (key: string) => string) => z.object({
+  group_name: z.string().min(1, t("itemGroups.groupNameRequired")),
   description: z.string().optional(),
 });
-
-type ItemGroupFormData = z.infer<typeof itemGroupSchema>;
 
 interface ItemGroupFormProps {
   itemGroup?: ItemGroup;
@@ -26,6 +25,10 @@ export const ItemGroupForm = ({
   isLoading,
   isEdit,
 }: ItemGroupFormProps) => {
+  const { t } = useTranslation();
+  const itemGroupSchema = getItemGroupSchema(t);
+  type ItemGroupFormData = z.infer<typeof itemGroupSchema>;
+
   const {
     control,
     handleSubmit,
@@ -49,7 +52,9 @@ export const ItemGroupForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Group Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("itemGroups.groupName")} *
+          </label>
           <Controller
             name="group_name"
             control={control}
@@ -57,7 +62,7 @@ export const ItemGroupForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter group name"
+                placeholder={t("itemGroups.enterGroupName")}
                 status={errors.group_name ? "error" : ""}
               />
             )}
@@ -68,7 +73,9 @@ export const ItemGroupForm = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.description")}
+          </label>
           <Controller
             name="description"
             control={control}
@@ -76,7 +83,7 @@ export const ItemGroupForm = ({
               <Input.TextArea
                 {...field}
                 size="large"
-                placeholder="Enter group description"
+                placeholder={t("itemGroups.enterDescription")}
                 rows={4}
                 status={errors.description ? "error" : ""}
               />
@@ -91,15 +98,13 @@ export const ItemGroupForm = ({
 
         <div className="md:col-span-2 flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} Item Group
+            {isEdit ? t("common.update") : t("common.create")} {t("itemGroups.title").split(" ")[0]} {t("itemGroups.title").split(" ")[1]}
           </Button>
         </div>
       </div>
     </form>
   );
 };
-
-

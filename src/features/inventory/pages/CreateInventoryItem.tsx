@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import { InventoryItemForm } from "../components/InventoryItemForm";
 import { useCreateInventoryItem } from "../hooks";
 import { CreateInventoryItemData } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const CreateInventoryItem = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const createMutation = useCreateInventoryItem();
 
   const handleSubmit = (data: CreateInventoryItemData) => {
@@ -38,10 +40,10 @@ export const CreateInventoryItem = () => {
             type="text"
             size="large"
           >
-            Back
+            {t("common.back")}
           </Button>
           <Title level={2} className="mb-0">
-            Create New Inventory Item
+            {t("inventory.createItem")}
           </Title>
         </div>
 

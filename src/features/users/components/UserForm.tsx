@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { User, CreateUserData, UpdateUserData } from "../types";
 import { useRoles } from "@/features/roles/hooks";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
@@ -15,29 +16,29 @@ interface UserFormProps {
   isEdit?: boolean;
 }
 
-const createUserSchema = z.object({
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
-  full_name: z.string().min(1, "Full name is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.string().min(1, "Role is required"),
+const getCreateUserSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t("validation.emailInvalid")).min(1, t("users.emailRequired")),
+  full_name: z.string().min(1, t("users.usernameRequired")),
+  password: z.string().min(6, t("users.passwordMinLength")),
+  role: z.string().min(1, t("users.usernameRequired")),
   phone: z.string().optional(),
 });
 
-const updateUserSchema = z.object({
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
-  full_name: z.string().min(1, "Full name is required"),
+const getUpdateUserSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t("validation.emailInvalid")).min(1, t("users.emailRequired")),
+  full_name: z.string().min(1, t("users.usernameRequired")),
   password: z
     .string()
     .optional()
     .refine((val) => !val || val.length === 0 || val.length >= 6, {
-      message: "Password must be at least 6 characters",
+      message: t("users.passwordMinLength"),
     }),
-  role: z.string().min(1, "Role is required"),
+  role: z.string().min(1, t("users.usernameRequired")),
   phone: z.string().optional(),
 });
 
-type CreateUserFormData = z.infer<typeof createUserSchema>;
-type UpdateUserFormData = z.infer<typeof updateUserSchema>;
+type CreateUserFormData = z.infer<ReturnType<typeof getCreateUserSchema>>;
+type UpdateUserFormData = z.infer<ReturnType<typeof getUpdateUserSchema>>;
 type UserFormData = CreateUserFormData | UpdateUserFormData;
 
 export const UserForm = ({
@@ -47,9 +48,12 @@ export const UserForm = ({
   isLoading,
   isEdit,
 }: UserFormProps) => {
-  // Fetch roles for dropdown
+  const { t } = useTranslation();
   const { data: rolesData, isLoading: rolesLoading } = useRoles({}, 1, 100);
   const roles = (rolesData as any)?.data || [];
+
+  const createUserSchema = getCreateUserSchema(t);
+  const updateUserSchema = getUpdateUserSchema(t);
 
   const {
     control,
@@ -74,7 +78,6 @@ export const UserForm = ({
       phone: data.phone || undefined,
     };
 
-    // Only include password if it's provided (for edit) or required (for create)
     if (!isEdit) {
       (submitData as CreateUserData).password = data.password as string;
     } else if (data.password && data.password.trim() !== "") {
@@ -88,7 +91,9 @@ export const UserForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Email *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.email")} *
+          </label>
           <Controller
             name="email"
             control={control}
@@ -96,9 +101,9 @@ export const UserForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter email"
+                placeholder={t("users.enterEmail")}
                 status={errors.email ? "error" : ""}
-                disabled={isEdit} // Email usually can't be changed
+                disabled={isEdit}
               />
             )}
           />
@@ -108,7 +113,9 @@ export const UserForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Full Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("users.fullName")} *
+          </label>
           <Controller
             name="full_name"
             control={control}
@@ -116,7 +123,7 @@ export const UserForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter full name"
+                placeholder={t("users.enterUsername")}
                 status={errors.full_name ? "error" : ""}
               />
             )}
@@ -130,7 +137,7 @@ export const UserForm = ({
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Password {isEdit ? "(leave blank to keep current)" : "*"}
+            {t("users.password")} {isEdit ? `(${t("common.close")} ${t("common.close")} ${t("common.close")})` : "*"}
           </label>
           <Controller
             name="password"
@@ -139,7 +146,7 @@ export const UserForm = ({
               <Input.Password
                 {...field}
                 size="large"
-                placeholder={isEdit ? "Enter new password" : "Enter password"}
+                placeholder={isEdit ? t("users.enterPassword") : t("users.enterPassword")}
                 status={errors.password ? "error" : ""}
               />
             )}
@@ -152,15 +159,19 @@ export const UserForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Role *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("users.role")} *
+          </label>
           <Controller
             name="role"
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
                 size="large"
-                placeholder="Select role"
+                placeholder={t("users.selectRole")}
                 className="w-full"
                 status={errors.role ? "error" : ""}
                 loading={rolesLoading}
@@ -186,7 +197,9 @@ export const UserForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Phone</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.phone")}
+          </label>
           <Controller
             name="phone"
             control={control}
@@ -194,7 +207,7 @@ export const UserForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter phone number"
+                placeholder={t("users.enterPhone")}
                 status={errors.phone ? "error" : ""}
               />
             )}
@@ -206,10 +219,10 @@ export const UserForm = ({
 
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} User
+            {isEdit ? t("common.update") : t("common.create")} {t("users.title").split(" ")[0]}
           </Button>
         </div>
       </div>

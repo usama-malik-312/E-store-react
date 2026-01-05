@@ -20,11 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useStores, useDeleteStore } from "../hooks";
 import { Store } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const StoresList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
@@ -50,44 +52,44 @@ export const StoresList = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: t("common.name"),
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Address",
+      title: t("common.address"),
       dataIndex: "address",
       key: "address",
       render: (addr: string) =>
-        addr || <span className="text-gray-400">No address</span>,
+        addr || <span className="text-gray-400">{t("common.noAddress")}</span>,
     },
     {
-      title: "Phone",
+      title: t("common.phone"),
       dataIndex: "phone",
       key: "phone",
       render: (phone: string) =>
         phone || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Email",
+      title: t("common.email"),
       dataIndex: "email",
       key: "email",
       render: (email: string) =>
         email || <span className="text-gray-400">-</span>,
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
         <Tag color={status === "active" ? "green" : "red"}>
-          {status || "active"}
+          {status === "active" ? t("inventory.active") : t("inventory.inactive")}
         </Tag>
       ),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: Store) => (
         <Space>
@@ -97,16 +99,16 @@ export const StoresList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this store?"
+            title={t("stores.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -117,21 +119,21 @@ export const StoresList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Stores Management</Title>
+        <Title level={2}>{t("stores.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Store
+          {t("stores.addStore")}
         </Button>
       </div>
 
       <Card>
         <div className="mb-4">
           <Input
-            placeholder="Search by store name..."
+            placeholder={t("stores.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={search}
             onChange={(e) => {
@@ -163,7 +165,7 @@ export const StoresList = () => {
                 total: (storesData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} stores`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("stores.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
@@ -183,5 +185,3 @@ export const StoresList = () => {
     </div>
   );
 };
-
-

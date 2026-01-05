@@ -21,7 +21,20 @@
     "error": "خرابی",
     "warning": "انتباہ",
     "info": "معلومات",
-    "total": "کل"
+    "total": "کل",
+    "name": "نام",
+    "description": "تفصیل",
+    "address": "پتہ",
+    "phone": "فون",
+    "email": "ای میل",
+    "status": "حالت",
+    "createdAt": "تاریخ تخلیق",
+    "noDescription": "کوئی تفصیل نہیں",
+    "noAddress": "کوئی پتہ نہیں",
+    "permissions": "اجازتیں",
+    "permission": "اجازت",
+    "permissionsCount": "{{count}} اجازت",
+    "permissionsCountPlural": "{{count}} اجازتیں"
   },
   "auth": {
     "login": "لاگ ان",
@@ -216,6 +229,7 @@
     "role": "کردار",
     "phone": "فون",
     "status": "حالت",
+    "fullName": "نام",
     "enterUsername": "صارف نام درج کریں",
     "enterEmail": "ای میل ایڈریس درج کریں",
     "enterPassword": "پاس ورڈ درج کریں",
@@ -231,17 +245,21 @@
     "updatedSuccessfully": "صارف کامیابی سے اپڈیٹ ہوا",
     "deletedSuccessfully": "صارف کامیابی سے حذف ہوا",
     "deleteConfirm": "کیا آپ واقعی اس صارف کو حذف کرنا چاہتے ہیں؟",
-    "searchPlaceholder": "نام، ای میل، یا صارف نام سے تلاش کریں..."
+    "searchPlaceholder": "نام، ای میل، یا صارف نام سے تلاش کریں...",
+    "filterByRole": "کردار سے فلٹر کریں",
+    "filterByStatus": "حالت سے فلٹر کریں"
   },
   "roles": {
     "title": "کردار اور اجازتیں",
     "addRole": "کردار شامل کریں",
     "createRole": "نیا کردار بنائیں",
     "editRole": "کردار میں ترمیم کریں",
+    "editPermissions": "اجازتیں ترمیم کریں",
     "roleName": "کردار کا نام",
     "roleCode": "کردار کوڈ",
     "description": "تفصیل",
     "permissions": "اجازتیں",
+    "totalPermissionsAssigned": "کل تفویض کردہ اجازتیں",
     "enterRoleName": "کردار کا نام درج کریں",
     "enterRoleCode": "کردار کوڈ درج کریں",
     "enterDescription": "کردار کی تفصیل درج کریں",
@@ -251,6 +269,7 @@
     "deletedSuccessfully": "کردار کامیابی سے حذف ہوا",
     "permissionsUpdated": "اجازتیں کامیابی سے اپڈیٹ ہوئیں",
     "deleteConfirm": "کیا آپ واقعی اس کردار کو حذف کرنا چاہتے ہیں؟",
+    "deleteDescription": "اس کردار والے صارفین کو دوبارہ تفویض کرنا ہوگا۔",
     "searchPlaceholder": "کردار کے نام سے تلاش کریں..."
   },
   "settings": {

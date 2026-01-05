@@ -3,13 +3,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Brand, CreateBrandData, UpdateBrandData } from "../types";
+import { useTranslation } from "react-i18next";
 
-const brandSchema = z.object({
-  name: z.string().min(1, "Brand name is required"),
+const getBrandSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t("brands.brandNameRequired")),
   description: z.string().optional(),
 });
-
-type BrandFormData = z.infer<typeof brandSchema>;
 
 interface BrandFormProps {
   brand?: Brand;
@@ -26,6 +25,10 @@ export const BrandForm = ({
   isLoading,
   isEdit,
 }: BrandFormProps) => {
+  const { t } = useTranslation();
+  const brandSchema = getBrandSchema(t);
+  type BrandFormData = z.infer<typeof brandSchema>;
+
   const {
     control,
     handleSubmit,
@@ -49,7 +52,9 @@ export const BrandForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Brand Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("brands.brandName")} *
+          </label>
           <Controller
             name="name"
             control={control}
@@ -57,7 +62,7 @@ export const BrandForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter brand name"
+                placeholder={t("brands.enterBrandName")}
                 status={errors.name ? "error" : ""}
               />
             )}
@@ -68,7 +73,9 @@ export const BrandForm = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.description")}
+          </label>
           <Controller
             name="description"
             control={control}
@@ -76,7 +83,7 @@ export const BrandForm = ({
               <Input.TextArea
                 {...field}
                 size="large"
-                placeholder="Enter brand description"
+                placeholder={t("brands.enterDescription")}
                 rows={4}
                 status={errors.description ? "error" : ""}
               />
@@ -91,15 +98,13 @@ export const BrandForm = ({
 
         <div className="md:col-span-2 flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} Brand
+            {isEdit ? t("common.update") : t("common.create")} {t("brands.title").split(" ")[0]}
           </Button>
         </div>
       </div>
     </form>
   );
 };
-
-

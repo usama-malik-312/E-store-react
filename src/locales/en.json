@@ -21,7 +21,20 @@
     "error": "Error",
     "warning": "Warning",
     "info": "Info",
-    "total": "Total"
+    "total": "Total",
+    "name": "Name",
+    "description": "Description",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "status": "Status",
+    "createdAt": "Created At",
+    "noDescription": "No description",
+    "noAddress": "No address",
+    "permissions": "Permissions",
+    "permission": "Permission",
+    "permissionsCount": "{{count}} permission",
+    "permissionsCountPlural": "{{count}} permissions"
   },
   "auth": {
     "login": "Login",
@@ -118,7 +131,9 @@
     "updatedSuccessfully": "Brand updated successfully",
     "deletedSuccessfully": "Brand deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this brand?",
-    "searchPlaceholder": "Search by brand name..."
+    "searchPlaceholder": "Search by brand name...",
+    "notFound": "Brand not found",
+    "backToBrands": "Back to Brands"
   },
   "stores": {
     "title": "Stores Management",
@@ -139,7 +154,9 @@
     "updatedSuccessfully": "Store updated successfully",
     "deletedSuccessfully": "Store deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this store?",
-    "searchPlaceholder": "Search by store name..."
+    "searchPlaceholder": "Search by store name...",
+    "notFound": "Store not found",
+    "backToStores": "Back to Stores"
   },
   "suppliers": {
     "title": "Suppliers Management",
@@ -161,7 +178,9 @@
     "updatedSuccessfully": "Supplier updated successfully",
     "deletedSuccessfully": "Supplier deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this supplier?",
-    "searchPlaceholder": "Search by name, contact, phone, or email..."
+    "searchPlaceholder": "Search by name, contact, phone, or email...",
+    "notFound": "Supplier not found",
+    "backToSuppliers": "Back to Suppliers"
   },
   "itemGroups": {
     "title": "Item Groups Management",
@@ -177,7 +196,9 @@
     "updatedSuccessfully": "Item group updated successfully",
     "deletedSuccessfully": "Item group deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this item group?",
-    "searchPlaceholder": "Search by group name..."
+    "searchPlaceholder": "Search by group name...",
+    "notFound": "Item group not found",
+    "backToItemGroups": "Back to Item Groups"
   },
   "customers": {
     "title": "Customers Management",
@@ -202,7 +223,9 @@
     "updatedSuccessfully": "Customer updated successfully",
     "deletedSuccessfully": "Customer deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this customer?",
-    "searchPlaceholder": "Search by name, email, phone, or customer code..."
+    "searchPlaceholder": "Search by name, email, phone, or customer code...",
+    "notFound": "Customer not found",
+    "backToCustomers": "Back to Customers"
   },
   "users": {
     "title": "Users Management",
@@ -238,10 +261,12 @@
     "addRole": "Add Role",
     "createRole": "Create New Role",
     "editRole": "Edit Role",
+    "editPermissions": "Edit Permissions",
     "roleName": "Role Name",
     "roleCode": "Role Code",
     "description": "Description",
     "permissions": "Permissions",
+    "totalPermissionsAssigned": "Total Permissions Assigned",
     "enterRoleName": "Enter role name",
     "enterRoleCode": "Enter role code",
     "enterDescription": "Enter role description",
@@ -251,6 +276,7 @@
     "deletedSuccessfully": "Role deleted successfully",
     "permissionsUpdated": "Permissions updated successfully",
     "deleteConfirm": "Are you sure you want to delete this role?",
+    "deleteDescription": "Users with this role will need to be reassigned.",
     "searchPlaceholder": "Search by role name..."
   },
   "settings": {

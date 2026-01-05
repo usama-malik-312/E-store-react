@@ -30,6 +30,9 @@ import { EditInventoryItem } from "@/features/inventory/pages/EditInventoryItem"
 import { POS } from "@/pages/POS";
 import { Settings } from "@/pages/Settings";
 import { Unauthorized } from "@/pages/Unauthorized";
+import { SalesList } from "@/features/pos/pages/SalesList";
+import { SaleDetail } from "@/features/pos/pages/SaleDetail";
+import { SalesStatistics } from "@/features/pos/pages/SalesStatistics";
 
 export const router = createBrowserRouter([
   {
@@ -276,6 +279,36 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <MainLayout>
           <POS />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pos/sales",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <SalesList />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pos/sales/:id",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <SaleDetail />
+        </MainLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pos/statistics",
+    element: (
+      <ProtectedRoute>
+        <MainLayout>
+          <SalesStatistics />
         </MainLayout>
       </ProtectedRoute>
     ),

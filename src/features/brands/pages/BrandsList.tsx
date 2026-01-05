@@ -19,18 +19,19 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useBrands, useDeleteBrand } from "../hooks";
 import { Brand } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const BrandsList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
 
   const { data: brandsData, isLoading } = useBrands({ search }, page, limit);
 
-  // Extract brands array and pagination from response
   const brands = (brandsData as any)?.data || [];
   const brandsArray = Array.isArray(brands) ? brands : [];
 
@@ -50,27 +51,27 @@ export const BrandsList = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: t("common.name"),
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Description",
+      title: t("common.description"),
       dataIndex: "description",
       key: "description",
       render: (desc: string) =>
-        desc || <span className="text-gray-400">No description</span>,
+        desc || <span className="text-gray-400">{t("common.noDescription")}</span>,
     },
     {
-      title: "Created At",
+      title: t("common.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) =>
         date ? new Date(date).toLocaleDateString() : "-",
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: Brand) => (
         <Space>
@@ -80,16 +81,16 @@ export const BrandsList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this brand?"
+            title={t("brands.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -100,21 +101,21 @@ export const BrandsList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Brands Management</Title>
+        <Title level={2}>{t("brands.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Brand
+          {t("brands.addBrand")}
         </Button>
       </div>
 
       <Card>
         <div className="mb-4">
           <Input
-            placeholder="Search by brand name..."
+            placeholder={t("brands.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={search}
             onChange={(e) => {
@@ -146,7 +147,7 @@ export const BrandsList = () => {
                 total: (brandsData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} brands`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("brands.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
@@ -166,5 +167,3 @@ export const BrandsList = () => {
     </div>
   );
 };
-
-

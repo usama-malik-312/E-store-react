@@ -3,16 +3,15 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Supplier, CreateSupplierData, UpdateSupplierData } from "../types";
+import { useTranslation } from "react-i18next";
 
-const supplierSchema = z.object({
-  name: z.string().min(1, "Supplier name is required"),
+const getSupplierSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t("suppliers.supplierNameRequired")),
   contact_person: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  email: z.string().email(t("validation.emailInvalid")).optional().or(z.literal("")),
   address: z.string().optional(),
 });
-
-type SupplierFormData = z.infer<typeof supplierSchema>;
 
 interface SupplierFormProps {
   supplier?: Supplier;
@@ -29,6 +28,10 @@ export const SupplierForm = ({
   isLoading,
   isEdit,
 }: SupplierFormProps) => {
+  const { t } = useTranslation();
+  const supplierSchema = getSupplierSchema(t);
+  type SupplierFormData = z.infer<typeof supplierSchema>;
+
   const {
     control,
     handleSubmit,
@@ -58,7 +61,9 @@ export const SupplierForm = ({
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Supplier Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("suppliers.supplierName")} *
+          </label>
           <Controller
             name="name"
             control={control}
@@ -66,7 +71,7 @@ export const SupplierForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter supplier name"
+                placeholder={t("suppliers.enterSupplierName")}
                 status={errors.name ? "error" : ""}
               />
             )}
@@ -77,7 +82,9 @@ export const SupplierForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Contact Person</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("suppliers.contactPerson")}
+          </label>
           <Controller
             name="contact_person"
             control={control}
@@ -85,7 +92,7 @@ export const SupplierForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter contact person name"
+                placeholder={t("suppliers.enterContactPerson")}
                 status={errors.contact_person ? "error" : ""}
               />
             )}
@@ -98,7 +105,9 @@ export const SupplierForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Phone</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.phone")}
+          </label>
           <Controller
             name="phone"
             control={control}
@@ -106,7 +115,7 @@ export const SupplierForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter phone number"
+                placeholder={t("suppliers.enterPhone")}
                 status={errors.phone ? "error" : ""}
               />
             )}
@@ -117,7 +126,9 @@ export const SupplierForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Email</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.email")}
+          </label>
           <Controller
             name="email"
             control={control}
@@ -126,7 +137,7 @@ export const SupplierForm = ({
                 {...field}
                 type="email"
                 size="large"
-                placeholder="Enter email address"
+                placeholder={t("suppliers.enterEmail")}
                 status={errors.email ? "error" : ""}
               />
             )}
@@ -137,7 +148,9 @@ export const SupplierForm = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-2">Address</label>
+          <label className="block text-sm font-medium mb-2">
+            {t("common.address")}
+          </label>
           <Controller
             name="address"
             control={control}
@@ -145,7 +158,7 @@ export const SupplierForm = ({
               <Input.TextArea
                 {...field}
                 size="large"
-                placeholder="Enter supplier address"
+                placeholder={t("suppliers.enterAddress")}
                 rows={3}
                 status={errors.address ? "error" : ""}
               />
@@ -158,15 +171,13 @@ export const SupplierForm = ({
 
         <div className="md:col-span-2 flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Create"} Supplier
+            {isEdit ? t("common.update") : t("common.create")} {t("suppliers.title").split(" ")[0]}
           </Button>
         </div>
       </div>
     </form>
   );
 };
-
-

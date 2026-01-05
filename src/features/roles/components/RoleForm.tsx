@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Role, CreateRoleData, UpdateRoleData, PermissionGroup, Permission } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface RoleFormProps {
   role?: Role;
@@ -13,16 +14,15 @@ interface RoleFormProps {
   isEdit?: boolean;
 }
 
-const roleSchema = z.object({
-  name: z.string().min(1, 'Role name is required'),
-  code: z.string().min(1, 'Role code is required'),
+const getRoleSchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t('roles.roleNameRequired')),
+  code: z.string().min(1, t('roles.roleNameRequired')),
   description: z.string().optional(),
   permissionIds: z.array(z.number()).optional(),
 });
 
-type RoleFormData = z.infer<typeof roleSchema>;
+type RoleFormData = z.infer<ReturnType<typeof getRoleSchema>>;
 
-// Group permissions by module
 const groupPermissionsByModule = (permissions: Permission[]): PermissionGroup[] => {
   const grouped: Record<string, Permission[]> = {};
   
@@ -48,7 +48,9 @@ export const RoleForm = ({
   isLoading,
   isEdit,
 }: RoleFormProps) => {
+  const { t } = useTranslation();
   const permissionGroups = groupPermissionsByModule(permissions);
+  const roleSchema = getRoleSchema(t);
 
   const {
     control,
@@ -73,21 +75,13 @@ export const RoleForm = ({
     });
   };
 
-  const handleSelectAll = (modulePermissions: Permission[]) => {
-    const allSelected = modulePermissions.every((p) => selectedPermissions.includes(p.id));
-    const newSelection = allSelected
-      ? selectedPermissions.filter((id) => !modulePermissions.some((p) => p.id === id))
-      : [...new Set([...selectedPermissions, ...modulePermissions.map((p) => p.id)])];
-    
-    // This would need to be handled via setValue from react-hook-form
-    // For now, we'll use a simpler approach
-  };
-
   return (
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Role Name *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t('roles.roleName')} *
+          </label>
           <Controller
             name="name"
             control={control}
@@ -95,7 +89,7 @@ export const RoleForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter role name (e.g., Store Manager)"
+                placeholder={t('roles.enterRoleName')}
                 status={errors.name ? 'error' : ''}
               />
             )}
@@ -104,7 +98,9 @@ export const RoleForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Role Code *</label>
+          <label className="block text-sm font-medium mb-2">
+            {t('roles.roleCode')} *
+          </label>
           <Controller
             name="code"
             control={control}
@@ -112,9 +108,9 @@ export const RoleForm = ({
               <Input
                 {...field}
                 size="large"
-                placeholder="Enter role code (e.g., store_manager)"
+                placeholder={t('roles.enterRoleCode')}
                 status={errors.code ? 'error' : ''}
-                disabled={isEdit} // Code usually can't be changed
+                disabled={isEdit}
               />
             )}
           />
@@ -122,7 +118,9 @@ export const RoleForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm font-medium mb-2">
+            {t('common.description')}
+          </label>
           <Controller
             name="description"
             control={control}
@@ -130,7 +128,7 @@ export const RoleForm = ({
               <Input.TextArea
                 {...field}
                 size="large"
-                placeholder="Enter role description"
+                placeholder={t('roles.enterDescription')}
                 rows={3}
                 status={errors.description ? 'error' : ''}
               />
@@ -143,13 +141,15 @@ export const RoleForm = ({
 
         {isEdit && (
           <div className="text-sm text-blue-600 dark:text-blue-400 mb-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-            💡 Note: To edit permissions, use the "Edit Permissions" button on the roles list.
+            💡 {t('roles.editPermissions')}
           </div>
         )}
 
         {!isEdit && (
           <div>
-            <label className="block text-sm font-medium mb-2">Permissions</label>
+            <label className="block text-sm font-medium mb-2">
+              {t('roles.permissions')}
+            </label>
           <Controller
             name="permissionIds"
             control={control}
@@ -195,14 +195,13 @@ export const RoleForm = ({
 
         <div className="flex justify-end gap-2 pt-4">
           <Button onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? 'Update' : 'Create'} Role
+            {isEdit ? t('common.update') : t('common.create')} {t('roles.title').split(' ')[0]}
           </Button>
         </div>
       </div>
     </form>
   );
 };
-

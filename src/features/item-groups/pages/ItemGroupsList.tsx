@@ -19,11 +19,13 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useItemGroups, useDeleteItemGroup } from "../hooks";
 import { ItemGroup } from "../types";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const ItemGroupsList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [search, setSearch] = useState("");
@@ -49,27 +51,27 @@ export const ItemGroupsList = () => {
 
   const columns = [
     {
-      title: "Group Name",
+      title: t("itemGroups.groupName"),
       dataIndex: "group_name",
       key: "group_name",
       sorter: true,
     },
     {
-      title: "Description",
+      title: t("common.description"),
       dataIndex: "description",
       key: "description",
       render: (desc: string) =>
-        desc || <span className="text-gray-400">No description</span>,
+        desc || <span className="text-gray-400">{t("common.noDescription")}</span>,
     },
     {
-      title: "Created At",
+      title: t("common.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) =>
         date ? new Date(date).toLocaleDateString() : "-",
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_: any, record: ItemGroup) => (
         <Space>
@@ -79,16 +81,16 @@ export const ItemGroupsList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t("common.edit")}
           </Button>
           <Popconfirm
-            title="Are you sure you want to delete this item group?"
+            title={t("itemGroups.deleteConfirm")}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Delete
+              {t("common.delete")}
             </Button>
           </Popconfirm>
         </Space>
@@ -99,21 +101,21 @@ export const ItemGroupsList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <Title level={2}>Item Groups Management</Title>
+        <Title level={2}>{t("itemGroups.title")}</Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleCreate}
           size="large"
         >
-          Add Item Group
+          {t("itemGroups.addItemGroup")}
         </Button>
       </div>
 
       <Card>
         <div className="mb-4">
           <Input
-            placeholder="Search by group name..."
+            placeholder={t("itemGroups.searchPlaceholder")}
             prefix={<SearchOutlined />}
             value={search}
             onChange={(e) => {
@@ -145,7 +147,7 @@ export const ItemGroupsList = () => {
                 total: (itemGroupsData as any)?.pagination?.total || 0,
                 showSizeChanger: true,
                 pageSizeOptions: ["10", "20", "50", "100"],
-                showTotal: (total) => `Total ${total} item groups`,
+                showTotal: (total) => `${t("common.total")} ${total} ${t("itemGroups.title").toLowerCase()}`,
                 onChange: (newPage, newPageSize) => {
                   setPage(newPage);
                   if (newPageSize !== limit) {
@@ -165,5 +167,3 @@ export const ItemGroupsList = () => {
     </div>
   );
 };
-
-
