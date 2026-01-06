@@ -35,8 +35,18 @@ export const inventoryApi = {
     if (filters.store_id) {
       params.store_id = filters.store_id;
     }
-    if (filters.item_group_id) {
-      params.item_group_id = filters.item_group_id;
+    // Handle item_group_id filter
+    // If item_group_id is explicitly set, include it
+    // -1 means ungrouped items (item_group_id IS NULL)
+    // Other numbers mean specific group ID
+    if (filters.item_group_id !== undefined && filters.item_group_id !== null) {
+      if (filters.item_group_id === -1) {
+        // For ungrouped items, send null to backend
+        // Backend should filter for items where item_group_id IS NULL
+        params.item_group_id = null;
+      } else {
+        params.item_group_id = filters.item_group_id;
+      }
     }
     if (filters.status) {
       params.status = filters.status;

@@ -13,8 +13,26 @@ import { useStoresDropdown } from "../../stores/hooks";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { InventoryItem } from "../../inventory/types";
 import { Receipt } from "../components/Receipt";
+import { InventoryFilters } from "../../inventory/types";
 
 const { Title, Text } = Typography;
+
+// Debounce hook
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 export function POSMainScreen() {
   const { user } = useAuthContext();
@@ -23,18 +41,54 @@ export function POSMainScreen() {
     user?.store_id ? Number(user.store_id) : undefined
   );
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "credit" | "mixed">("cash");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "cash" | "card" | "credit" | "mixed"
+  >("cash");
   const [amountPaid, setAmountPaid] = useState<number>(0);
   const [globalDiscount, setGlobalDiscount] = useState<number>(0);
   const [completedSale, setCompletedSale] = useState<any>(null);
   const [showReceipt, setShowReceipt] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 
-  // Fetch data
-  const { data: inventoryData, isLoading: inventoryLoading } = useInventoryItems(
-    selectedStore ? { store_id: selectedStore } : {},
-    1,
-    1000 // Get all items for POS
-  );
+  // Debounce search term
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  // Build filters for API call
+  const inventoryFilters = useMemo<InventoryFilters>(() => {
+    const filters: InventoryFilters = {};
+
+    if (selectedStore) {
+      filters.store_id = selectedStore;
+    }
+
+    if (debouncedSearch.trim()) {
+      filters.search = debouncedSearch.trim();
+    }
+
+    // Handle group filter
+    // null = All Items (don't send item_group_id)
+    // -1 = Ungroup (items without group) - send null to backend
+    // number = Specific group ID
+    if (selectedGroupId !== null) {
+      if (selectedGroupId === -1) {
+        // For ungrouped items, send -1 which the API will convert to null
+        filters.item_group_id = -1;
+      } else {
+        filters.item_group_id = selectedGroupId;
+      }
+    }
+
+    return filters;
+  }, [selectedStore, debouncedSearch, selectedGroupId]);
+
+  // Fetch data from API with filters
+  const { data: inventoryData, isLoading: inventoryLoading } =
+    useInventoryItems(
+      inventoryFilters,
+      1,
+      1000 // Get all items for POS
+    );
   const { data: customers } = useCustomersDropdown();
   const { data: stores } = useStoresDropdown();
   const createSaleMutation = useCreateSale();
@@ -134,14 +188,19 @@ export function POSMainScreen() {
     }
 
     if (!paymentMethod) {
-      Modal.error({ title: "Error", content: "Please select a payment method." });
+      Modal.error({
+        title: "Error",
+        content: "Please select a payment method.",
+      });
       return;
     }
 
     if (paymentMethod !== "credit" && amountPaid < totals.total) {
       Modal.error({
         title: "Error",
-        content: `Amount paid (${formatCurrency(amountPaid)}) is less than total (${formatCurrency(totals.total)}).`,
+        content: `Amount paid (${formatCurrency(
+          amountPaid
+        )}) is less than total (${formatCurrency(totals.total)}).`,
       });
       return;
     }
@@ -180,7 +239,9 @@ export function POSMainScreen() {
   // Enrich cart items with inventory data
   const enrichedCartItems = useMemo(() => {
     return cartItems.map((item) => {
-      const inventory = inventoryItems.find((inv) => inv.id === item.inventory_id);
+      const inventory = inventoryItems.find(
+        (inv) => inv.id === item.inventory_id
+      );
       return {
         ...item,
         inventory,
@@ -206,9 +267,7 @@ export function POSMainScreen() {
               options={storesList.map((s) => ({ label: s.name, value: s.id }))}
             />
           )}
-          <Text>
-            {new Date().toLocaleString()}
-          </Text>
+          <Text>{new Date().toLocaleString()}</Text>
         </Space>
       </div>
 
@@ -216,12 +275,23 @@ export function POSMainScreen() {
       <Row gutter={16} className="flex-1" style={{ minHeight: 0 }}>
         {/* Left Panel - Product Search */}
         <Col xs={24} lg={14} className="flex flex-col" style={{ minHeight: 0 }}>
-          <Card className="flex-1 flex flex-col" bodyStyle={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <Card
+            className="flex-1 flex flex-col"
+            bodyStyle={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <ProductSearch
               items={inventoryItems}
               loading={inventoryLoading}
               onSelectItem={handleAddToCart}
               selectedStoreId={selectedStore}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              selectedGroupId={selectedGroupId}
+              onGroupChange={setSelectedGroupId}
             />
           </Card>
         </Col>
@@ -230,8 +300,19 @@ export function POSMainScreen() {
         <Col xs={24} lg={10} className="flex flex-col" style={{ minHeight: 0 }}>
           <Row gutter={[0, 16]} className="flex-1" style={{ minHeight: 0 }}>
             {/* Cart */}
-            <Col span={24} className="flex flex-col" style={{ minHeight: 0, maxHeight: "40%" }}>
-              <Card className="flex-1 flex flex-col" bodyStyle={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <Col
+              span={24}
+              className="flex flex-col"
+              style={{ minHeight: 0, maxHeight: "40%" }}
+            >
+              <Card
+                className="flex-1 flex flex-col"
+                bodyStyle={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <Cart
                   items={enrichedCartItems}
                   onUpdateQuantity={handleUpdateQuantity}
@@ -242,7 +323,11 @@ export function POSMainScreen() {
             </Col>
 
             {/* Checkout Panel */}
-            <Col span={24} className="flex flex-col" style={{ minHeight: 0, flex: 1 }}>
+            <Col
+              span={24}
+              className="flex flex-col"
+              style={{ minHeight: 0, flex: 1 }}
+            >
               <CheckoutPanel
                 totals={totals}
                 selectedCustomer={selectedCustomer}
@@ -290,4 +375,3 @@ export function POSMainScreen() {
     </div>
   );
 }
-
