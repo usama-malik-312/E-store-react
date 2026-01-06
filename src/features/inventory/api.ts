@@ -23,22 +23,56 @@ export const inventoryApi = {
       totalPages: number;
     };
   }> => {
+    const params: any = {
+      page,
+      limit,
+    };
+    
+    // Only include filters if they have values
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    if (filters.store_id) {
+      params.store_id = filters.store_id;
+    }
+    if (filters.item_group_id) {
+      params.item_group_id = filters.item_group_id;
+    }
+    if (filters.status) {
+      params.status = filters.status;
+    }
+    if (filters.brand_id) {
+      params.brand_id = filters.brand_id;
+    }
+    if (filters.supplier_id) {
+      params.supplier_id = filters.supplier_id;
+    }
+    if (filters.sort) {
+      params.sort = filters.sort;
+    } else {
+      params.sort = "item_name ASC";
+    }
+    
     const response = await axiosInstance.get<ApiResponse<any[]>>("/inventory", {
-      params: {
-        ...filters,
-        page,
-        limit,
-        search: filters.search,
-        sort: filters.sort || "item_name:ASC",
-      },
+      params,
     });
     const result = unwrapPaginatedResponse(response.data);
     // Transform price to selling_price if backend returns 'price'
+    // Also normalize store_name, group_name, brand_name, supplier_name from nested objects if needed
     const transformedData = result.data.map((item: any) => {
       const sellingPrice = item.selling_price ?? item.price;
       return {
         ...item,
         selling_price: sellingPrice ? Number(sellingPrice) : 0,
+        // Normalize store fields
+        store_name: item.store_name || item.store?.name,
+        store_location: item.store_location || item.store?.location,
+        // Normalize group fields
+        group_name: item.group_name || item.item_group?.group_name,
+        // Normalize brand fields
+        brand_name: item.brand_name || item.brand?.name,
+        // Normalize supplier fields
+        supplier_name: item.supplier_name || item.supplier?.name,
       };
     });
     return {
@@ -51,10 +85,20 @@ export const inventoryApi = {
     const response = await axiosInstance.get<ApiResponse<any>>(`/inventory/${id}`);
     const data = unwrapResponse(response.data);
     // Transform price to selling_price if backend returns 'price'
+    // Also normalize store_name, group_name, brand_name, supplier_name from nested objects if needed
     const sellingPrice = data.selling_price ?? data.price;
     return {
       ...data,
       selling_price: sellingPrice ? Number(sellingPrice) : 0,
+      // Normalize store fields
+      store_name: data.store_name || data.store?.name,
+      store_location: data.store_location || data.store?.location,
+      // Normalize group fields
+      group_name: data.group_name || data.item_group?.group_name,
+      // Normalize brand fields
+      brand_name: data.brand_name || data.brand?.name,
+      // Normalize supplier fields
+      supplier_name: data.supplier_name || data.supplier?.name,
     };
   },
 
@@ -114,7 +158,7 @@ export const inventoryApi = {
   },
 
   getLowStockItems: async (
-    storeId: number,
+    storeId?: number,
     threshold?: number
   ): Promise<{
     data: LowStockItem[];
@@ -125,13 +169,17 @@ export const inventoryApi = {
       totalPages: number;
     };
   }> => {
+    const params: any = {};
+    if (storeId) {
+      params.store_id = storeId;
+    }
+    if (threshold) {
+      params.threshold = threshold;
+    }
     const response = await axiosInstance.get<ApiResponse<any[]>>(
       "/inventory/low-stock",
       {
-        params: {
-          store_id: storeId,
-          threshold,
-        },
+        params,
       }
     );
     const result = unwrapPaginatedResponse(response.data);

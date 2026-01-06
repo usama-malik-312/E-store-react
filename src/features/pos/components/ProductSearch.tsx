@@ -109,3 +109,4 @@ export function ProductSearch({ items, loading, onSelectItem, selectedStoreId }:
   );
 }
 
+

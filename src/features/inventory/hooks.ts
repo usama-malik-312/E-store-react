@@ -15,7 +15,6 @@ export const useInventoryItems = (
   return useQuery({
     queryKey: ["inventory", filters, page, limit],
     queryFn: () => inventoryApi.getInventoryItems(filters, page, limit),
-    enabled: !!filters.store_id,
     placeholderData: (previousData) => previousData,
     staleTime: 2 * 60 * 1000,
   });
@@ -37,11 +36,10 @@ export const useInventoryItemsDropdown = (storeId?: number) => {
   });
 };
 
-export const useLowStockItems = (storeId: number | null, threshold?: number) => {
+export const useLowStockItems = (storeId: number | null | undefined, threshold?: number) => {
   return useQuery({
     queryKey: ["inventory", "low-stock", storeId, threshold],
-    queryFn: () => inventoryApi.getLowStockItems(storeId!, threshold),
-    enabled: !!storeId,
+    queryFn: () => inventoryApi.getLowStockItems(storeId || undefined, threshold),
     staleTime: 2 * 60 * 1000,
   });
 };

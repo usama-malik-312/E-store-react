@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { InventoryItemForm } from "../components/InventoryItemForm";
 import { useCreateInventoryItem } from "../hooks";
-import { CreateInventoryItemData } from "../types";
+import { CreateInventoryItemData, InventoryItem } from "../types";
 import { useTranslation } from "react-i18next";
+import { message } from "antd";
 
 const { Title } = Typography;
 
@@ -16,7 +17,14 @@ export const CreateInventoryItem = () => {
 
   const handleSubmit = (data: CreateInventoryItemData) => {
     createMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (createdItem: InventoryItem) => {
+        // Show success message with store name if available
+        const storeName = createdItem.store_name || createdItem.store?.name;
+        if (storeName) {
+          message.success(
+            `${t("inventory.itemCreatedSuccess") || "Item created successfully"} - ${t("inventory.savedToStore") || "Saved to"} ${storeName}`
+          );
+        }
         navigate("/inventory");
       },
     });

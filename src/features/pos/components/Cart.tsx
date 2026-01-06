@@ -44,3 +44,4 @@ export function Cart({ items, onUpdateQuantity, onRemove, onClear }: CartProps) 
   );
 }
 
+

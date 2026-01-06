@@ -166,3 +166,4 @@ export function Receipt({ sale }: ReceiptProps) {
   );
 }
 
+
